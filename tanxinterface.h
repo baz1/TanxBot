@@ -5,6 +5,13 @@
 #include <QMap>
 #include <QWebSocket>
 
+enum Team {
+    Blue = 0,
+    Red = 1,
+    Green = 2,
+    Yellow = 3
+};
+
 struct Tank {
     int team;
     QString owner;

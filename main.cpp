@@ -2,11 +2,7 @@
 
 #include "tanxinterface.h"
 #include "userinterface.h"
-
-// Team 0: Blue
-// Team 1: Red
-// Team 2: Green
-// Team 3: Yellow
+#include "tanxmap.h"
 
 int main(int argc, char *argv[])
 {

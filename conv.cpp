@@ -29,6 +29,7 @@ int main(void)
         rot(x2, y2);
         fprintf(outputFile, "%d %d %d %d\n", x1 - 1, y1 - 1, x2 - 1, y2 - 1);
     }
+    fprintf(outputFile, "-1\n");
     fclose(inputFile);
     fclose(outputFile);
     return 0;

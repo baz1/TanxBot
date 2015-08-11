@@ -17,8 +17,10 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     tanxinterface.cpp \
-    userinterface.cpp
+    userinterface.cpp \
+    tanxmap.cpp
 
 HEADERS += \
     tanxinterface.h \
-    userinterface.h
+    userinterface.h \
+    tanxmap.h
