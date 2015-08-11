@@ -10,11 +10,9 @@ private:
         double x1, y1, x2, y2;
     };
 public:
-    TanxMap();
-    ~TanxMap();
-    static TanxMap *instance();
+    static bool initialize();
 private:
-    QList<Border> borders;
+    static QList<Border> borders;
 };
 
 #endif // TANXMAP_H
