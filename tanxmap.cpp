@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+QList<TanxMap::Border> TanxMap::borders;
+
 bool TanxMap::initialize()
 {
     FILE *mapFile = fopen("map.txt", "r");

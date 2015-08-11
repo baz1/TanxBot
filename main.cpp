@@ -7,6 +7,8 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    if (!TanxMap::initialize())
+        return 1;
     TanxInterface tanxThread;
     UserInterface userThread;
     QEventLoop evtLoop;
