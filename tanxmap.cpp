@@ -6,6 +6,13 @@ static TanxMap *_instance = NULL;
 
 TanxMap::TanxMap()
 {
+    if (_instance)
+    {
+        fprintf(stderr, "Warning: TanxMap should only have one instance.\n");
+        borders = _instance->borders;
+        return;
+    }
+    _instance = this;
     FILE *mapFile = fopen("map.txt", "r");
     if (!mapFile)
     {
@@ -29,6 +36,11 @@ TanxMap::TanxMap()
         borders.append(border);
     }
     fclose(mapFile);
+}
+
+TanxMap::~TanxMap()
+{
+    _instance = NULL;
 }
 
 TanxMap *TanxMap::instance()

@@ -11,6 +11,7 @@ private:
     };
 public:
     TanxMap();
+    ~TanxMap();
     static TanxMap *instance();
 private:
     QList<Border> borders;
