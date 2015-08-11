@@ -7,7 +7,7 @@ class TanxMap
 {
 private:
     struct Border {
-        int x1, y1, x2, y2;
+        double x1, y1, x2, y2;
     };
 public:
     TanxMap();

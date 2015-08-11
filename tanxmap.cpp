@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-static TanxMap *_instance = new TanxMap();
+static TanxMap *_instance = NULL;
 
 TanxMap::TanxMap()
 {
@@ -15,12 +15,17 @@ TanxMap::TanxMap()
     while (true)
     {
         Border border;
-        fscanf(mapFile, "%d", &border.x1);
-        if (border.x1 < 0)
+        int tmp;
+        fscanf(mapFile, "%d", &tmp);
+        if (tmp < 0)
             break;
-        fscanf(mapFile, "%d", &border.y1);
-        fscanf(mapFile, "%d", &border.x2);
-        fscanf(mapFile, "%d", &border.y2);
+        border.x1 = tmp;
+        fscanf(mapFile, "%d", &tmp);
+        border.y1 = tmp;
+        fscanf(mapFile, "%d", &tmp);
+        border.x2 = tmp;
+        fscanf(mapFile, "%d", &tmp);
+        border.y2 = tmp;
         borders.append(border);
     }
     fclose(mapFile);
