@@ -38,8 +38,9 @@ struct Pickable {
 struct Bullet {
     int tank;
     double x, y;
-    double tx, ty;
+    double dx, dy;
     bool isRed;
+    qint64 launched;
 };
 
 struct GameData {

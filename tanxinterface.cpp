@@ -277,11 +277,13 @@ void TanxInterface::onTextReceived(QString str)
                     val2 = val.toObject().value("tx");
                     if (!val2.isDouble())
                         goto unknown_msg;
-                    bullet.tx = val2.toDouble();
+                    bullet.dx = val2.toDouble();
+                    bullet.dx -= bullet.x;
                     val2 = val.toObject().value("ty");
                     if (!val2.isDouble())
                         goto unknown_msg;
-                    bullet.ty = val2.toDouble();
+                    bullet.dy = val2.toDouble();
+                    bullet.dy -= bullet.y;
                     val2 = val.toObject().value("s");
                     if (val2.isUndefined())
                     {
@@ -292,6 +294,7 @@ void TanxInterface::onTextReceived(QString str)
                     } else {
                         goto unknown_msg;
                     }
+                    bullet.launched = QDateTime::currentMSecsSinceEpoch();
                     val2 = val.toObject().value("id");
                     if (!val2.isDouble())
                         goto unknown_msg;

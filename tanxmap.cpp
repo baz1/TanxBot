@@ -15,7 +15,6 @@ bool TanxMap::initialize()
     while (true)
     {
         Border border;
-        int tmp;
         fscanf(mapFile, "%d", &border.x1);
         if (border.x1 < 0)
             break;
@@ -41,10 +40,10 @@ double TanxMap::getDuration(double x, double y, double dx, double dy)
         det = 1. / det;
         d1 = border.x1 - x;
         d2 = y - border.y1;
-        beta = detinv * (d1 * dy + d2 * dx);
+        beta = det * (d1 * dy + d2 * dx);
         if ((beta < 0) || (beta > 1))
             continue;
-        alpha = detinv * (d1 * border.dY + d2 * border.dX);
+        alpha = det * (d1 * border.dY + d2 * border.dX);
         if (alpha < 0)
             continue;
         if (duration > alpha)
