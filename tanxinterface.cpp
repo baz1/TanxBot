@@ -326,6 +326,19 @@ void TanxInterface::onTextReceived(QString str)
                 }
             }
             obj.remove("bulletsDelete");
+            {
+                QMap<int, Bullet>::const_iterator bulletIter = data.bullets.begin();
+                qint64 now = QDateTime::currentMSecsSinceEpoch();
+                while (bulletIter != data.bullets.end())
+                {
+                    if (now >= bulletIter.value().expire)
+                    {
+                        bulletIter = data.bullets.erase(bulletIter);
+                    } else {
+                        ++bulletIter;
+                    }
+                }
+            }
             val = obj.value("teams");
             if (!val.isUndefined())
             {
