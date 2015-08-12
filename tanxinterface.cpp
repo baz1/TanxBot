@@ -327,7 +327,7 @@ void TanxInterface::onTextReceived(QString str)
             }
             obj.remove("bulletsDelete");
             {
-                QMap<int, Bullet>::const_iterator bulletIter = data.bullets.begin();
+                QMap<int, Bullet>::iterator bulletIter = data.bullets.begin();
                 qint64 now = QDateTime::currentMSecsSinceEpoch();
                 while (bulletIter != data.bullets.end())
                 {
