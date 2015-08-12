@@ -7,10 +7,11 @@ class TanxMap
 {
 private:
     struct Border {
-        double x1, y1, x2, y2;
+        int x1, y1, dX, dY;
     };
 public:
     static bool initialize();
+    static double getDuration(double x, double y, double dx, double dy);
 private:
     static QList<Border> borders;
 };

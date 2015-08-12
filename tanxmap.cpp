@@ -16,18 +16,39 @@ bool TanxMap::initialize()
     {
         Border border;
         int tmp;
-        fscanf(mapFile, "%d", &tmp);
-        if (tmp < 0)
+        fscanf(mapFile, "%d", &border.x1);
+        if (border.x1 < 0)
             break;
-        border.x1 = tmp;
-        fscanf(mapFile, "%d", &tmp);
-        border.y1 = tmp;
-        fscanf(mapFile, "%d", &tmp);
-        border.x2 = tmp;
-        fscanf(mapFile, "%d", &tmp);
-        border.y2 = tmp;
+        fscanf(mapFile, "%d", &border.y1);
+        fscanf(mapFile, "%d", &border.dX);
+        border.dX -= border.x1;
+        fscanf(mapFile, "%d", &border.dY);
+        border.dY -= border.y1;
         borders.append(border);
     }
     fclose(mapFile);
     return true;
+}
+
+double TanxMap::getDuration(double x, double y, double dx, double dy)
+{
+    double duration = 1000, det, d1, d2, alpha, beta;
+    foreach (const Border &border, borders)
+    {
+        det = dx * border.dY - dy * border.dX;
+        if (det <= 0)
+            continue;
+        det = 1. / det;
+        d1 = border.x1 - x;
+        d2 = y - border.y1;
+        beta = detinv * (d1 * dy + d2 * dx);
+        if ((beta < 0) || (beta > 1))
+            continue;
+        alpha = detinv * (d1 * border.dY + d2 * border.dX);
+        if (alpha < 0)
+            continue;
+        if (duration > alpha)
+            duration = alpha;
+    }
+    return duration;
 }
