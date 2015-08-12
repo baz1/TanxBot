@@ -1,5 +1,7 @@
 #include "tanxinterface.h"
 
+#include "tanxmap.h"
+
 #include <QtCore>
 
 #include <stdio.h>
@@ -294,10 +296,14 @@ void TanxInterface::onTextReceived(QString str)
                     } else {
                         goto unknown_msg;
                     }
-                    bullet.launched = QDateTime::currentMSecsSinceEpoch();
                     val2 = val.toObject().value("id");
                     if (!val2.isDouble())
                         goto unknown_msg;
+                    double len = sqrt(bullet.dx * bullet.dx + bullet.dy * bullet.dy);
+                    bullet.dx /= len;
+                    bullet.dy /= len;
+                    bullet.launched = QDateTime::currentMSecsSinceEpoch();
+                    bullet.expire = bullet.launched + (qint64) (TanxMap::getDuration(bullet.x, bullet.y, bullet.dx, bullet.dy) / 0.016);
                     data.bullets[val2.toInt()] = bullet;
                 }
             }

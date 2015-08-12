@@ -40,7 +40,7 @@ struct Bullet {
     double x, y;
     double dx, dy;
     bool isRed;
-    qint64 launched;
+    qint64 launched, expire;
 };
 
 struct GameData {
