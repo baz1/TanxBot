@@ -50,7 +50,7 @@ struct GameData
     QMap<QString, QString> users;
     QString mySSID;
     QMap<int, Tank> tanks;
-    int myID;
+    int myID, myTeam;
     int teamScores[4];
     QMap<int, Pickable> pickables;
     QMap<int, Bullet> bullets;

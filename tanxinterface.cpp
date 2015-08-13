@@ -293,6 +293,8 @@ void TanxInterface::onTextReceived(QString str)
                     if (!val2.isDouble())
                         goto unknown_msg;
                     bullet.tank = val2.toInt();
+                    if (data.tanks[bullet.tank].team == data.myTeam)
+                        continue;
                     val2 = val.toObject().value("x");
                     if (!val2.isDouble())
                         goto unknown_msg;
@@ -463,6 +465,7 @@ void TanxInterface::onTextReceived(QString str)
                 printf("Initialization complete.\n");
                 fflush(stdout);
                 data.myID = val2.toInt();
+                data.myTeam = tank.team;
                 emit initialized();
             }
         } else if (name == "tank.delete")

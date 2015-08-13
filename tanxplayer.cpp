@@ -38,6 +38,7 @@ void TanxPlayer::gotUpdate()
         return;
     double x = me.x + (30 * 0.006) * lastRep.rx, y = me.y + (30 * 0.006) * lastRep.ry;
     Repulsion rep = TanxMap::getBordersRepulsion(x, y);
+    printf("Repulsion at (%lf,%lf): (%lf,%lf)\n", x, y, rep.rx, rep.ry);
     rep.rx /= 10;
     rep.ry /= 10;
     QMap<int, Bullet>::iterator bulletIter = interface->data.bullets.begin();
