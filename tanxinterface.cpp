@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 
-TanxInterface::TanxInterface() : QObject(NULL)
+TanxInterface::TanxInterface(bool checkForExpiredBullets) : QObject(NULL), checkForExpiredBullets(checkForExpiredBullets)
 {
     connect(&wSocket, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(&wSocket, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
@@ -304,7 +304,7 @@ void TanxInterface::onTextReceived(QString str)
                     bullet.dy /= len;
                     bullet.launched = QDateTime::currentMSecsSinceEpoch();
                     bullet.expire = bullet.launched + (qint64) (TanxMap::getDuration(bullet.x, bullet.y, bullet.dx, bullet.dy) / 0.016);
-                    data.bullets[val2.toInt()] = bullet;
+                    emit newBullet(val2.toInt(), data.bullets[val2.toInt()] = bullet);
                 }
             }
             obj.remove("bullets");
@@ -326,6 +326,7 @@ void TanxInterface::onTextReceived(QString str)
                 }
             }
             obj.remove("bulletsDelete");
+            if (checkForExpiredBullets)
             {
                 QMap<int, Bullet>::iterator bulletIter = data.bullets.begin();
                 qint64 now = QDateTime::currentMSecsSinceEpoch();
@@ -333,6 +334,7 @@ void TanxInterface::onTextReceived(QString str)
                 {
                     if (now >= bulletIter.value().expire)
                     {
+                        emit delBullet(bulletIter.key());
                         bulletIter = data.bullets.erase(bulletIter);
                     } else {
                         ++bulletIter;

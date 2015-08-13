@@ -57,7 +57,7 @@ class TanxInterface : public QObject
 {
     Q_OBJECT
 public:
-    explicit TanxInterface();
+    explicit TanxInterface(bool checkForExpiredBullets = true);
     ~TanxInterface();
     void setShooting(bool enabled = true);
     void setTarget(double angle);
@@ -69,6 +69,8 @@ signals:
     void gotUpdate();
     void endOfGame(int scoreTeam1, int scoreTeam2, int scoreTeam3, int scoreTeam4);
     void disconnected();
+    void newBullet(int id, const Bullet &bullet);
+    void delBullet(int id);
 public slots:
     void endConnection();
 private slots:
@@ -81,6 +83,7 @@ private:
 public:
     QWebSocket wSocket;
     GameData data;
+    bool checkForExpiredBullets;
 };
 
 #endif // TANXINTERFACE_H
