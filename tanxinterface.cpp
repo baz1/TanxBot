@@ -136,18 +136,32 @@ void TanxInterface::onTextReceived(QString str)
                     val2 = val.toObject().value("x");
                     if (!val2.isUndefined())
                     {
-                        if (!val2.isDouble())
+                        if (val2.isNull())
+                        {
+                            rtank.dx = -rtank.x;
+                            rtank.x = 0;
+                        } else if (val2.isDouble())
+                        {
+                            rtank.dx = val2.toDouble() - rtank.x;
+                            rtank.x = val2.toDouble();
+                        } else {
                             goto unknown_msg;
-                        rtank.dx = val2.toDouble() - rtank.x;
-                        rtank.x = val2.toDouble();
+                        }
                     }
                     val2 = val.toObject().value("y");
                     if (!val2.isUndefined())
                     {
-                        if (!val2.isDouble())
+                        if (val2.isNull())
+                        {
+                            rtank.dy = -rtank.y;
+                            rtank.y = 0;
+                        } else if (val2.isDouble())
+                        {
+                            rtank.dy = val2.toDouble() - rtank.y;
+                            rtank.y = val2.toDouble();
+                        } else {
                             goto unknown_msg;
-                        rtank.dy = val2.toDouble() - rtank.y;
-                        rtank.y = val2.toDouble();
+                        }
                     }
                     val2 = val.toObject().value("a");
                     if (!val2.isUndefined())
