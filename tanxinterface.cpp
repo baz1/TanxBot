@@ -7,10 +7,12 @@
 #include <stdio.h>
 #include <math.h>
 
-TanxInterface::TanxInterface(QObject *parent, bool checkForExpiredBullets) : QObject(parent), checkForExpiredBullets(checkForExpiredBullets)
+TanxInterface::TanxInterface(QObject *parent, bool checkForExpiredBullets)
+    : QObject(parent), checkForExpiredBullets(checkForExpiredBullets), endedConnection(false)
 {
     connect(&wSocket, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(&wSocket, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
+    connect(&wSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onError(QAbstractSocket::SocketError)));
     connect(&wSocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onTextReceived(QString)));
     data.myID = -1;
     wSocket.open(QUrl("wss://tanx.playcanvas.com/socket/520/xkzs4vvy/websocket"));
@@ -62,13 +64,22 @@ void TanxInterface::onConnected()
 
 void TanxInterface::onDisconnected()
 {
+    if (!endedConnection)
+        fprintf(stderr, "Error: Unexpected disconnection.\n");
     emit disconnected();
     //QCoreApplication::instance()->quit();
 }
 
 void TanxInterface::endConnection()
 {
+    endedConnection = true;
     wSocket.close();
+}
+
+void TanxInterface::onError(QAbstractSocket::SocketError error)
+{
+    Q_UNUSED(error)
+    fprintf(stderr, "QWebSocket error: %s\n", qPrintable(wSocket.errorString()));
 }
 
 void TanxInterface::onTextReceived(QString str)

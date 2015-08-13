@@ -5,13 +5,10 @@
 #include <QMap>
 #include <QWebSocket>
 
-enum Team
-{
-    Blue = 0,
-    Red = 1,
-    Green = 2,
-    Yellow = 3
-};
+#define TEAM_BLUE   0
+#define TEAM_RED    1
+#define TEAM_GREEN  2
+#define TEAM_YELLOW 3
 
 struct Tank
 {
@@ -82,6 +79,7 @@ public slots:
 private slots:
     void onConnected();
     void onDisconnected();
+    void onError(QAbstractSocket::SocketError error);
     void onTextReceived(QString str);
 private:
     QString angleToStream(double angle);
@@ -90,6 +88,7 @@ public:
     QWebSocket wSocket;
     GameData data;
     bool checkForExpiredBullets;
+    bool endedConnection;
 };
 
 #endif // TANXINTERFACE_H

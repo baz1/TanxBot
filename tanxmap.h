@@ -8,9 +8,13 @@
 struct Repulsion
 {
     double rx, ry;
+    bool isNegligible() const
+    {
+        return (rx * rx + ry * ry < 0.028);
+    }
 };
 
-Repulsion operator+(Repulsion a, Repulsion b);
+const Repulsion NULL_REPULSION = {0., 0.};
 
 class TanxMap
 {

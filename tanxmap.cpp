@@ -3,17 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 
-const Repulsion NULL_REPULSION = {0., 0.};
-
 QList<TanxMap::Border> TanxMap::borders;
-
-Repulsion operator+(Repulsion a, Repulsion b)
-{
-    Repulsion sum;
-    sum.rx = a.rx + b.rx;
-    sum.ry = a.ry + b.ry;
-    return sum;
-}
 
 bool TanxMap::initialize()
 {
@@ -63,8 +53,6 @@ double TanxMap::getDuration(double x, double y, double dx, double dy)
     return duration;
 }
 
-//template <typename T> inline T sq(const T &a) { return a * a; }
-
 Repulsion TanxMap::getTrajectoryRepulsion(double x, double y, const Bullet &bullet, qint64 timestamp)
 {
     Repulsion result = NULL_REPULSION;
@@ -109,8 +97,11 @@ Repulsion TanxMap::getBordersRepulsion(double x, double y)
     Repulsion result = NULL_REPULSION;
     foreach (const TanxMap::Border &border, borders)
     {
+        int len = qMax(qAbs(border.dX), qAbs(border.dY));
         double alpha = (x - border.x1) * border.dX + (y - border.y1) * border.dY;
+        alpha /= len;
         double beta = (x - border.x1) * border.dY + (border.y1 - y) * border.dX;
+        beta /= len;
         if (beta >= 0)
             continue;
         if (alpha <= 0)
@@ -118,21 +109,27 @@ Repulsion TanxMap::getBordersRepulsion(double x, double y)
             double rx = x - border.x1;
             double ry = y - border.y1;
             double dist = sqrt(rx * rx + ry * ry);
+            if (dist >= 3.)
+                continue;
             dist = 1. / (dist * dist * dist);
             result.rx += rx * dist;
             result.ry += ry * dist;
             continue;
         }
-        if (alpha > qMax(border.dX, border.dY)) // (only horizontal and vertical borders)
+        if (alpha > len) // (only horizontal and vertical borders)
         {
             double rx = x - (border.x1 + border.dX);
             double ry = y - (border.y1 + border.dY);
             double dist = sqrt(rx * rx + ry * ry);
+            if (dist >= 3.)
+                continue;
             dist = 1. / (dist * dist * dist);
             result.rx += rx * dist;
             result.ry += ry * dist;
             continue;
         }
+        if ((qAbs(beta) * len) >= 3.)
+            continue;
         beta = 1. / (beta * beta);
         result.rx += -border.dY * beta;
         result.ry += border.dX * beta;
