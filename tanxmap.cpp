@@ -97,11 +97,11 @@ Repulsion TanxMap::getBordersRepulsion(double x, double y)
     Repulsion result = NULL_REPULSION;
     foreach (const TanxMap::Border &border, borders)
     {
-        int len = qMax(qAbs(border.dX), qAbs(border.dY));
+        int len = qMax(qAbs(border.dX), qAbs(border.dY)); // (only horizontal and vertical borders)
         double alpha = (x - border.x1) * border.dX + (y - border.y1) * border.dY;
-        alpha /= len;
+        alpha /= len * len;
         double beta = (x - border.x1) * border.dY + (border.y1 - y) * border.dX;
-        beta /= len;
+        beta /= len * len;
         if (beta >= 0)
             continue;
         if (alpha <= 0)
@@ -109,27 +109,27 @@ Repulsion TanxMap::getBordersRepulsion(double x, double y)
             double rx = x - border.x1;
             double ry = y - border.y1;
             double dist = sqrt(rx * rx + ry * ry);
-//          if (dist >= 3.)
-//              continue;
+            if (dist >= 2.)
+                continue;
             dist = 1. / (dist * dist * dist);
             result.rx += rx * dist;
             result.ry += ry * dist;
             continue;
         }
-        if (alpha > len) // (only horizontal and vertical borders)
+        if (alpha > 1)
         {
             double rx = x - (border.x1 + border.dX);
             double ry = y - (border.y1 + border.dY);
             double dist = sqrt(rx * rx + ry * ry);
-//          if (dist >= 3.)
-//              continue;
+            if (dist >= 2.)
+                continue;
             dist = 1. / (dist * dist * dist);
             result.rx += rx * dist;
             result.ry += ry * dist;
             continue;
         }
-//      if ((qAbs(beta) * len) >= 3.)
-//          continue;
+        if ((qAbs(beta) * len) >= 2.)
+            continue;
         beta = 1. / (beta * beta);
         result.rx += -border.dY * beta;
         result.ry += border.dX * beta;
