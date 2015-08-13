@@ -5,14 +5,16 @@
 #include <QMap>
 #include <QWebSocket>
 
-enum Team {
+enum Team
+{
     Blue = 0,
     Red = 1,
     Green = 2,
     Yellow = 3
 };
 
-struct Tank {
+struct Tank
+{
     int team;
     QString owner;
     double x, y;
@@ -25,7 +27,8 @@ struct Tank {
     int score;
 };
 
-struct Pickable {
+struct Pickable
+{
     enum {
         Repair,
         Damage,
@@ -35,15 +38,18 @@ struct Pickable {
     double x, y;
 };
 
-struct Bullet {
+struct Bullet
+{
     int tank;
     double x, y;
-    double dx, dy;
+    double dx, dy; // Unit length
     bool isRed;
+    double duration;
     qint64 launched, expire;
 };
 
-struct GameData {
+struct GameData
+{
     QMap<QString, QString> users;
     QString mySSID;
     QMap<int, Tank> tanks;

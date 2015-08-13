@@ -1,8 +1,19 @@
 #include "tanxmap.h"
 
 #include <stdio.h>
+#include <math.h>
+
+const Repulsion NULL_REPULSION = {0., 0.};
 
 QList<TanxMap::Border> TanxMap::borders;
+
+Repulsion operator+(Repulsion a, Repulsion b)
+{
+    Repulsion sum;
+    sum.rx = a.rx + b.rx;
+    sum.ry = a.ry + b.ry;
+    return sum;
+}
 
 bool TanxMap::initialize()
 {
@@ -50,4 +61,81 @@ double TanxMap::getDuration(double x, double y, double dx, double dy)
             duration = alpha;
     }
     return duration;
+}
+
+//template <typename T> inline T sq(const T &a) { return a * a; }
+
+Repulsion TanxMap::getTrajectoryRepulsion(double x, double y, const Bullet &bullet, qint64 timestamp)
+{
+    Repulsion result = NULL_REPULSION;
+    double spent = bullet.duration * ((double) (timestamp - bullet.launched)) / ((double) (bullet.expire - bullet.launched));
+    double alpha = (x - bullet.x) * bullet.dx + (y - bullet.y) * bullet.dy;
+    if (alpha <= spent)
+    {
+        result.rx = x - (bullet.x + bullet.dx * spent);
+        result.ry = y - (bullet.y + bullet.dy * spent);
+        double dist = sqrt(result.rx * result.rx + result.ry * result.ry);
+        dist = 1. / (dist * dist * dist);
+        result.rx *= dist;
+        result.ry *= dist;
+        return result;
+    }
+    if (alpha > bullet.duration)
+    {
+        result.rx = x - (bullet.x + bullet.dx * bullet.duration);
+        result.ry = y - (bullet.y + bullet.dy * bullet.duration);
+        double dist = sqrt(result.rx * result.rx + result.ry * result.ry);
+        dist = 1. / (dist * dist * dist);
+        result.rx *= dist;
+        result.ry *= dist;
+        return result;
+    }
+    double beta = (x - bullet.x) * bullet.dy + (bullet.y - y) * bullet.dx;
+    bool neg = (beta > 0);
+    beta = 1. / (beta * beta);
+    if (neg)
+    {
+        result.rx = bullet.dy * beta;
+        result.ry = -bullet.dx * beta;
+    } else {
+        result.rx = -bullet.dy * beta;
+        result.ry = bullet.dx * beta;
+    }
+    return result;
+}
+
+Repulsion TanxMap::getBordersRepulsion(double x, double y)
+{
+    Repulsion result = NULL_REPULSION;
+    foreach (const TanxMap::Border &border, borders)
+    {
+        double alpha = (x - border.x1) * border.dX + (y - border.y1) * border.dY;
+        double beta = (x - border.x1) * border.dY + (border.y1 - y) * border.dX;
+        if (beta >= 0)
+            continue;
+        if (alpha <= 0)
+        {
+            double rx = x - border.x1;
+            double ry = y - border.y1;
+            double dist = sqrt(rx * rx + ry * ry);
+            dist = 1. / (dist * dist * dist);
+            result.rx += rx * dist;
+            result.ry += ry * dist;
+            continue;
+        }
+        if (alpha > qMax(border.dX, border.dY)) // (only horizontal and vertical borders)
+        {
+            double rx = x - (border.x1 + border.dX);
+            double ry = y - (border.y1 + border.dY);
+            double dist = sqrt(rx * rx + ry * ry);
+            dist = 1. / (dist * dist * dist);
+            result.rx += rx * dist;
+            result.ry += ry * dist;
+            continue;
+        }
+        beta = 1. / (beta * beta);
+        result.rx += -border.dY * beta;
+        result.ry += border.dX * beta;
+    }
+    return result;
 }

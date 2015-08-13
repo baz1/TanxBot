@@ -302,8 +302,9 @@ void TanxInterface::onTextReceived(QString str)
                     double len = sqrt(bullet.dx * bullet.dx + bullet.dy * bullet.dy);
                     bullet.dx /= len;
                     bullet.dy /= len;
+                    bullet.duration = TanxMap::getDuration(bullet.x, bullet.y, bullet.dx, bullet.dy);
                     bullet.launched = QDateTime::currentMSecsSinceEpoch();
-                    bullet.expire = bullet.launched + (qint64) (TanxMap::getDuration(bullet.x, bullet.y, bullet.dx, bullet.dy) / 0.016);
+                    bullet.expire = bullet.launched + (qint64) (bullet.duration / 0.016);
                     emit newBullet(val2.toInt(), data.bullets[val2.toInt()] = bullet);
                 }
             }
