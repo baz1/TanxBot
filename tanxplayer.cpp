@@ -37,10 +37,11 @@ void TanxPlayer::gotUpdate()
     if (me.dead)
         return;
     double x = me.x + (30 * 0.006) * lastRep.rx, y = me.y + (30 * 0.006) * lastRep.ry;
+    /* Border repulsion */
     Repulsion rep = TanxMap::getBordersRepulsion(x, y);
-    printf("Repulsion at (%lf,%lf): (%lf,%lf)\n", x, y, rep.rx, rep.ry);
     rep.rx /= 10;
     rep.ry /= 10;
+    /* Bullet repulsion */
     QMap<int, Bullet>::iterator bulletIter = interface->data.bullets.begin();
     qint64 now = QDateTime::currentMSecsSinceEpoch();
     qint64 timestamp = now + 30;
@@ -61,6 +62,7 @@ void TanxPlayer::gotUpdate()
         rep.ry += tmp.ry;
         ++bulletIter;
     }
+    /* Moving management */
     double norm = sqrt(rep.rx * rep.rx + rep.ry * rep.ry);
     if (norm == 0)
     {
@@ -75,7 +77,5 @@ void TanxPlayer::gotUpdate()
     rep.rx *= norm;
     rep.ry *= norm;
     interface->move(rep.rx, rep.ry);
-    printf("Move: [%lf,%lf]\n", rep.rx, rep.ry);
-    fflush(stdout);
     lastRep = rep;
 }
