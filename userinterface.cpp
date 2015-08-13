@@ -17,7 +17,7 @@ void intSignalHandler(int sig)
     hIMutex.unlock();
 }
 
-UserInterface::UserInterface() : usingUI(false)
+UserInterface::UserInterface(QObject *parent) : QThread(parent), usingUI(false)
 {
     struct sigaction newSig;
     newSig.sa_handler = intSignalHandler;

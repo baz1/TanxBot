@@ -8,7 +8,7 @@
 class UserInterface : public QThread
 {
 public:
-    UserInterface();
+    UserInterface(QObject *parent = NULL);
     ~UserInterface();
 protected:
     void run();

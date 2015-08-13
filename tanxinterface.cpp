@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 
-TanxInterface::TanxInterface(bool checkForExpiredBullets) : QObject(NULL), checkForExpiredBullets(checkForExpiredBullets)
+TanxInterface::TanxInterface(QObject *parent, bool checkForExpiredBullets) : QObject(parent), checkForExpiredBullets(checkForExpiredBullets)
 {
     connect(&wSocket, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(&wSocket, SIGNAL(disconnected()), this, SLOT(onDisconnected()));

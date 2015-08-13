@@ -57,7 +57,7 @@ class TanxInterface : public QObject
 {
     Q_OBJECT
 public:
-    explicit TanxInterface(bool checkForExpiredBullets = true);
+    explicit TanxInterface(QObject *parent = NULL, bool checkForExpiredBullets = true);
     ~TanxInterface();
     void setShooting(bool enabled = true);
     void setTarget(double angle);
