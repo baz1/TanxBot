@@ -214,13 +214,13 @@ void TanxInterface::onTextReceived(QString str)
                             goto unknown_msg;
                         }
                     }
-                    if ((tank.dx != 0) || (tank.dy != 0))
+                    if ((rtank.dx != 0) || (rtank.dy != 0))
                     {
-                        double distinv = (TANK_SPEED / BULLET_SPEED) / sqrt(tank.dx * tank.dx + tank.dy * tank.dy);
-                        tank.dx *= distinv;
-                        tank.dy *= distinv;
+                        double distinv = (TANK_SPEED / BULLET_SPEED) / sqrt(rtank.dx * rtank.dx + rtank.dy * rtank.dy);
+                        rtank.dx *= distinv;
+                        rtank.dy *= distinv;
                     }
-                    Q_ASSERT(tank.dx * tank.dx + tank.dy * tank.dy < 0.25);
+                    Q_ASSERT(rtank.dx * rtank.dx + rtank.dy * rtank.dy < 0.25);
                     val2 = val.toObject().value("a");
                     if (!val2.isUndefined())
                     {
