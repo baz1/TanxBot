@@ -28,6 +28,7 @@ UserInterface::UserInterface(QObject *parent) : QThread(parent), usingUI(false),
 UserInterface::~UserInterface()
 {
     sigaction(SIGINT, &oldSig, NULL);
+    hasInterrupt = false;
 }
 
 void UserInterface::abort()

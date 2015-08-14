@@ -10,6 +10,8 @@ TanxPlayer::TanxPlayer(TanxInterface *interface, QString myName, QString followN
 {
     QObject::connect(interface, SIGNAL(initialized()), this, SLOT(initialized()), Qt::DirectConnection);
     QObject::connect(interface, SIGNAL(gotUpdate()), this, SLOT(gotUpdate()), Qt::DirectConnection);
+    QObject::connect(interface, SIGNAL(newTank(Tank)), this, SLOT(newTank(Tank)), Qt::DirectConnection);
+    QObject::connect(interface, SIGNAL(delTank(int)), this, SLOT(delTank(int)), Qt::DirectConnection);
 }
 
 void TanxPlayer::initialized()
@@ -23,6 +25,8 @@ void TanxPlayer::initialized()
             interface->endConnection();
             return;
         }
+        printf("Got the right team!\n");
+        fflush(stdout);
     } else {
         switch (me.team)
         {
@@ -129,12 +133,43 @@ void TanxPlayer::playUpdate()
     /* Following attraction */
     if (interface->data.tanks.contains(followTank))
     {
+        printf("a\n");
         const Tank &toFollow = interface->data.tanks.value(followTank);
         double dx = toFollow.x + toFollow.dx * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED) - x;
         double dy = toFollow.y + toFollow.dy * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED) - y;
-        double val = 0.7 / sqrt(dx * dx + dy * dy);
+        double val = sqrt(dx * dx + dy * dy);
+        val = 0.2 * (val > 3. + FOLLOW_DISTANCE ? 0.6 : val - FOLLOW_DISTANCE) / val;
         rep.rx += dx * val;
         rep.ry += dy * val;
+    }
+    /* Discard small moves */
+    double norm = sqrt(rep.rx * rep.rx + rep.ry * rep.ry);
+    if ((lastRep.rx == 0) && (lastRep.ry == 0))
+    {
+        if (norm > REP_NEGLIGIBLE)
+        {
+            norm = 1. / norm;
+            rep.rx *= norm;
+            rep.ry *= norm;
+        } else {
+            rep.rx = 0;
+            rep.ry = 0;
+        }
+    } else {
+        if (rep.rx * lastRep.rx + rep.ry * lastRep.ry < REP_THRESHOLD)
+        {
+            rep = lastRep;
+        } else {
+            if (norm > REP_NEGLIGIBLE)
+            {
+                norm = 1. / norm;
+                rep.rx *= norm;
+                rep.ry *= norm;
+            } else {
+                rep.rx = 0;
+                rep.ry = 0;
+            }
+        }
     }
     /* Shoot ennemies */
     x += rep.rx * (SHOOT_DELAY_MS * TANK_SPEED / 1000.);
@@ -165,21 +200,11 @@ void TanxPlayer::playUpdate()
         }
     }
     /* Moving and shooting interface management */
-    double norm = sqrt(rep.rx * rep.rx + rep.ry * rep.ry);
-    if (norm == 0)
+    if ((rep.rx == lastRep.rx) && (rep.ry == lastRep.ry))
     {
-        if ((lastRep.rx != 0) || (lastRep.ry != 0))
-        {
-            interface->targettedMove(bestShoot.angle, 0., 0., bestShoot.dist != 100);
-            lastRep = NULL_REPULSION;
-        } else {
-            interface->setTarget(bestShoot.angle, bestShoot.dist != 100);
-        }
+        interface->setTarget(bestShoot.angle, bestShoot.dist != 100);
     } else {
-        norm = 1. / norm;
-        rep.rx *= norm;
-        rep.ry *= norm;
         interface->targettedMove(bestShoot.angle, rep.rx, rep.ry, bestShoot.dist != 100);
-        lastRep = rep;
     }
+    lastRep = rep;
 }

@@ -60,23 +60,34 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error: Unrecognized option \"%s\".\n", qPrintable(arg));
         return 1;
     }
+    int tries = 1;
     while (true)
     {
-        TanxInterface tanxThread(NULL, false);
-        UserInterface userThread;
-        TanxPlayer tanxPlayer(&tanxThread, tankName, followName, targetName, team);
-        QEventLoop evtLoop;
-        QObject::connect(&tanxThread, SIGNAL(disconnected()), &evtLoop, SLOT(quit()));
-        QObject::connect(&userThread, SIGNAL(finished()), &tanxThread, SLOT(endConnection()));
-        userThread.start();
-        evtLoop.exec();
-        if (!tanxPlayer.gotWrongTeam())
+        while (true)
+        {
+            TanxInterface tanxThread(NULL, false);
+            UserInterface userThread;
+            TanxPlayer tanxPlayer(&tanxThread, tankName, followName, targetName, team);
+            QEventLoop evtLoop;
+            QObject::connect(&tanxThread, SIGNAL(disconnected()), &evtLoop, SLOT(quit()));
+            QObject::connect(&userThread, SIGNAL(finished()), &tanxThread, SLOT(endConnection()));
+            userThread.start();
+            evtLoop.exec();
+            if (!tanxPlayer.gotWrongTeam())
+                return 0;
+            userThread.abort();
+            userThread.wait(1000);
+            printf("Got wrong team.\n");
+            if (!(--tries))
+                break;
+            printf("Retrying in a moment...\n");
+            fflush(stdout);
+            QThread::sleep(5);
+        }
+        printf("How many tries? ");
+        scanf("%d", &tries);
+        if (tries <= 0)
             break;
-        userThread.abort();
-        userThread.wait(1000);
-        printf("Got wrong team. Retrying in a moment...\n");
-        fflush(stdout);
-        QThread::sleep(2);
     }
     return 0;
 }

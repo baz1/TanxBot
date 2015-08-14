@@ -144,6 +144,7 @@ Shoot TanxMap::getShoot(double x, double y, double ex, double ey, double dx, dou
 {
     double t1, t2, d1, d2;
     double exx = ex - x, eyy = ey - y;
+    Q_ASSERT(dx * dx + dy * dy < 0.25);
     double a = eyy * dx - exx * (1. + dy), hb = -eyy, c = exx * (1 - dy) + eyy * dx;
     if (a == 0)
     {

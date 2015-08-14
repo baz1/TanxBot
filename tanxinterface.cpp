@@ -39,6 +39,7 @@ void TanxInterface::setTarget(double angle)
 
 void TanxInterface::setTarget(double angle, bool shootingEnabled)
 {
+    printf(shootingEnabled ? "Shooting: true (%lf)\n" : "Shooting: false\n", angle);
     if (shootingEnabled)
     {
         QString str;
@@ -74,6 +75,8 @@ void TanxInterface::move(double dx, double dy)
 
 void TanxInterface::targettedMove(double angle, double dx, double dy, bool shootingEnabled)
 {
+    printf(shootingEnabled ? "Shooting: true (%lf)\n" : "Shooting: false\n", angle);
+    fflush(stdout);
     QString str;
     if (shootingEnabled)
     {
