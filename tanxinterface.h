@@ -15,10 +15,11 @@
 
 struct Tank
 {
+    int id;
     int team;
     QString owner;
     double x, y;
-    double dx, dy;
+    double dx, dy; // Relative to bullet speed (norm: TANK_SPEED / BULLET_SPEED)
     int angle;
     int hp;
     int sp;

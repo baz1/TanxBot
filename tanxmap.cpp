@@ -57,6 +57,9 @@ Repulsion TanxMap::getTrajectoryRepulsion(double x, double y, const Bullet &bull
 {
     Repulsion result = NULL_REPULSION;
     double spent = bullet.duration * ((double) (timestamp - bullet.launched)) / ((double) (bullet.expire - bullet.launched));
+    spent -= BULLET_SEC_DIST;
+    if (spent < 0)
+        spent = 0;
     double alpha = (x - bullet.x) * bullet.dx + (y - bullet.y) * bullet.dy;
     if (alpha <= spent)
     {
@@ -68,7 +71,7 @@ Repulsion TanxMap::getTrajectoryRepulsion(double x, double y, const Bullet &bull
         result.ry *= dist;
         return result;
     }
-    if (alpha > bullet.duration)
+    if (alpha > bullet.duration + BULLET_SEC_DIST)
     {
         result.rx = x - (bullet.x + bullet.dx * bullet.duration);
         result.ry = y - (bullet.y + bullet.dy * bullet.duration);
@@ -135,4 +138,60 @@ Repulsion TanxMap::getBordersRepulsion(double x, double y)
         result.ry += border.dX * beta;
     }
     return result;
+}
+
+Shoot getShoot(double x, double y, double ex, double ey, double dx, double dy)
+{
+    double t1, t2, d1, d2;
+    double exx = ex - x, eyy = ey - y;
+    double a = eyy * dx - exx * (1. + dy), hb = -eyy, c = exx * (1 - dy) + eyy * dx;
+    if (a == 0)
+    {
+        t1 = 3.141592653589793238463;
+        Q_ASSERT(b != 0);
+        t2 = 2 * atan(-c / (2 * b));
+    } else {
+        double delta = hb * hb - a * c;
+        Q_ASSERT(delta > 0);
+        delta = sqrt(delta);
+        t1 = 2 * atan((-hb + delta) / a);
+        t2 = 2 * atan((-hb - delta) / a);
+    }
+    if (qAbs(exx) > qAbs(eyy))
+    {
+        d1 = exx / (sin(t1) - dx);
+        d2 = exx / (sin(t2) - dx);
+    } else {
+        d1 = eyy / (cos(t1) - dy);
+        d2 = eyy / (cos(t2) - dy);
+    }
+    if (d1 < 0)
+    {
+        Q_ASSERT(d2 > 0);
+        return Shoot(t2, d2);
+    }
+    if (d2 < 0)
+    {
+        Q_ASSERT(d1 > 0);
+        return Shoot(t1, d1);
+    }
+    if (d1 < d2)
+    {
+        return Shoot(t1, d1);
+    } else {
+        return Shoot(t2, d2);
+    }
+}
+
+bool TanxMap::isPossible(double x, double y, double ex, double ey, Shoot shoot)
+{
+    double dx = sin(shoot.angle), dy = cos(shoot.angle);
+    if (getDuration(x, y, dx, dy) <= shoot.dist)
+        return false;
+    dx = (x + shoot.dist * dx) - ex;
+    dy = (y + shoot.dist * dy) - ey;
+    double dist = sqrt(dx * dx + dy * dy);
+    dx /= dist;
+    dy /= dist;
+    return (getDuration(ex, ey, dx, dy) > dist);
 }

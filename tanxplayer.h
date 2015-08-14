@@ -4,7 +4,9 @@
 #include "tanxinterface.h"
 #include "tanxmap.h"
 
-#define DELAY_MS 25
+#define DELAY_MS                25
+#define SHOOT_DELAY_MS          25
+#define IGNORE_DISTANCE         15.
 
 class TanxPlayer : public QObject
 {
@@ -17,6 +19,7 @@ public slots:
 private:
     TanxInterface *interface;
     Repulsion lastRep;
+    int targetTank;
 };
 
 #endif // TANXPLAYER_H

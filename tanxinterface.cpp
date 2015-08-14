@@ -163,6 +163,12 @@ void TanxInterface::onTextReceived(QString str)
                             goto unknown_msg;
                         }
                     }
+                    if ((tank.dx != 0) || (tank.dy != 0))
+                    {
+                        double distinv = (TANK_SPEED / BULLET_SPEED) / sqrt(tank.dx * tank.dx + tank.dy * tank.dy);
+                        tank.dx *= distinv;
+                        tank.dy *= distinv;
+                    }
                     val2 = val.toObject().value("a");
                     if (!val2.isUndefined())
                     {
@@ -459,12 +465,13 @@ void TanxInterface::onTextReceived(QString str)
             val2 = val.toObject().value("id");
             if (!val2.isDouble())
                 goto unknown_msg;
-            data.tanks[val2.toInt()] = tank;
+            tank.id = val2.toInt();
+            data.tanks[tank.id] = tank;
             if (tank.owner == data.mySSID)
             {
                 printf("Initialization complete.\n");
                 fflush(stdout);
-                data.myID = val2.toInt();
+                data.myID = tank.id;
                 data.myTeam = tank.team;
                 emit initialized();
             }

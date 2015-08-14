@@ -31,6 +31,8 @@ void TanxPlayer::initialized()
     interface->setName("AAAA");
 }
 
+template <typename T> inline T sq(const T &a) { return a * a; }
+
 void TanxPlayer::gotUpdate()
 {
     const Tank &me = interface->data.tanks.value(interface->data.myID);
@@ -68,14 +70,28 @@ void TanxPlayer::gotUpdate()
     {
         if ((lastRep.rx != 0) || (lastRep.ry != 0))
         {
-            interface->move(0., 0.);
+            //interface->move(0., 0.);
             lastRep = NULL_REPULSION;
         }
-        return;
+    } else {
+        norm = 1. / norm;
+        rep.rx *= norm;
+        rep.ry *= norm;
+        //interface->move(rep.rx, rep.ry);
+        lastRep = rep;
     }
-    norm = 1. / norm;
-    rep.rx *= norm;
-    rep.ry *= norm;
-    interface->move(rep.rx, rep.ry);
-    lastRep = rep;
+    /* Shooting management */
+    x += rep.rx * (SHOOT_DELAY_MS * TANK_SPEED / 1000.);
+    y += rep.ry * (SHOOT_DELAY_MS * TANK_SPEED / 1000.);
+    foreach (const Tank &tank, interface->data.tanks)
+    {
+        if (tank.team == interface->data.myTeam)
+            continue;
+        if (sq(x - tank.x) + sq(y - tank.y) > IGNORE_DISTANCE * IGNORE_DISTANCE)
+            continue;
+        double tx = tank.x + ((DELAY_MS + SHOOT_DELAY_MS) * TANK_SPEED / 1000.) * tank.dx;
+        double ty = tank.y + ((DELAY_MS + SHOOT_DELAY_MS) * TANK_SPEED / 1000.) * tank.dy;
+        // TODO getShoot blabla
+    }
+    // TODO
 }

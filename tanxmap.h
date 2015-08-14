@@ -8,6 +8,7 @@
 #define DELAY_MS_DEFAULT        30
 #define REPULSION_NEGLIGIBLE    0.028
 #define WALL_DIST_IGNORE        2.
+#define BULLET_SEC_DIST         0.2
 
 struct Repulsion
 {
@@ -19,6 +20,11 @@ struct Repulsion
 };
 
 const Repulsion NULL_REPULSION = {0., 0.};
+
+struct Shoot {
+    double angle, dist;
+    inline Shoot(double angle, double dist) : angle(angle), dist(dist) {}
+};
 
 class TanxMap
 {
@@ -32,6 +38,8 @@ public:
     static Repulsion getTrajectoryRepulsion(double x, double y, const Bullet &bullet,
         qint64 timestamp = QDateTime::currentMSecsSinceEpoch() + DELAY_MS_DEFAULT);
     static Repulsion getBordersRepulsion(double x, double y);
+    static Shoot getShoot(double x, double y, double ex, double ey, double dx, double dy);
+    static bool isPossible(double x, double y, double ex, double ey, Shoot shoot);
 private:
     static QList<Border> borders;
 };
