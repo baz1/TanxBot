@@ -20,6 +20,8 @@ class TanxPlayer : public QObject
 public:
     explicit TanxPlayer(TanxInterface *interface, QString myName, QString followName, QString targetName, int needTeam);
     inline bool gotWrongTeam() const;
+signals:
+    void enfOfInitialization();
 public slots:
     void initialized();
     void gotUpdate();

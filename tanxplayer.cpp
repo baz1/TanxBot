@@ -22,7 +22,7 @@ void TanxPlayer::initialized()
         if (me.team != needTeam)
         {
             wrongTeam = true;
-            interface->endConnection();
+            emit enfOfInitialization();
             return;
         }
         printf("Got the right team!\n");
@@ -46,10 +46,13 @@ void TanxPlayer::initialized()
         fflush(stdout);
     }
     interface->setName(myName);
+    emit enfOfInitialization();
 }
 
 void TanxPlayer::gotUpdate()
 {
+    if (wrongTeam)
+        return;
     playUpdate();
 }
 

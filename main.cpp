@@ -60,34 +60,37 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error: Unrecognized option \"%s\".\n", qPrintable(arg));
         return 1;
     }
-    int tries = 1;
-    while (true)
+    TanxInterface *tanxInterface;
+    QEventLoop evtLoop;
     {
+        QList<TanxInterface*> interfaces;
+        TanxPlayer* lastPlayer;
         while (true)
         {
-            TanxInterface tanxThread(NULL, false);
-            UserInterface userThread;
-            TanxPlayer tanxPlayer(&tanxThread, tankName, followName, targetName, team);
-            QEventLoop evtLoop;
-            QObject::connect(&tanxThread, SIGNAL(disconnected()), &evtLoop, SLOT(quit()));
-            QObject::connect(&userThread, SIGNAL(finished()), &tanxThread, SLOT(endConnection()));
-            userThread.start();
+            interfaces.append(new TanxInterface(NULL, false));
+            lastPlayer = new TanxPlayer(interfaces.last(), tankName, followName, targetName, team);
+            QObject::connect(lastPlayer, SIGNAL(enfOfInitialization()), &evtLoop, SLOT(quit()));
             evtLoop.exec();
-            if (!tanxPlayer.gotWrongTeam())
-                return 0;
-            userThread.abort();
-            userThread.wait(1000);
-            printf("Got wrong team.\n");
-            if (!(--tries))
+            lastPlayer->disconnect();
+            if (!lastPlayer->gotWrongTeam())
                 break;
-            printf("Retrying in a moment...\n");
-            fflush(stdout);
-            QThread::sleep(5);
         }
-        printf("How many tries? ");
-        scanf("%d", &tries);
-        if (tries <= 0)
-            break;
+        tanxInterface = interfaces.last();
+        for (int i = interfaces.length() - 2; i >= 0; --i)
+            delete interfaces.at(i);
+        interfaces.clear();
     }
+    if (!tanxInterface->isConnected())
+    {
+        fprintf(stderr, "Error: Got disconnected.\n");
+        delete tanxInterface;
+        return 1;
+    }
+    UserInterface userInterface;
+    QObject::connect(tanxInterface, SIGNAL(disconnected()), &evtLoop, SLOT(quit()));
+    QObject::connect(&userInterface, SIGNAL(finished()), tanxInterface, SLOT(endConnection()));
+    userInterface.start();
+    evtLoop.exec();
+    delete tanxInterface;
     return 0;
 }

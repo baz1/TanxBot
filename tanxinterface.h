@@ -72,6 +72,7 @@ public:
     void setName(QString userName);
     void move(double dx, double dy);
     void targettedMove(double angle, double dx, double dy, bool shootingEnabled);
+    bool isConnected() const;
 signals:
     void initialized();
     void gotUpdate();

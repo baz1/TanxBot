@@ -39,8 +39,6 @@ void TanxInterface::setTarget(double angle)
 
 void TanxInterface::setTarget(double angle, bool shootingEnabled)
 {
-    //printf(shootingEnabled ? "Shooting: true (%lf)\n" : "Shooting: false\n", angle);
-    //fflush(stdout);
     if (shootingEnabled)
     {
         QString str;
@@ -76,8 +74,6 @@ void TanxInterface::move(double dx, double dy)
 
 void TanxInterface::targettedMove(double angle, double dx, double dy, bool shootingEnabled)
 {
-    //printf(shootingEnabled ? "Shooting: true (%lf)\n" : "Shooting: false\n", angle);
-    //fflush(stdout);
     QString str;
     if (shootingEnabled)
     {
@@ -104,6 +100,11 @@ void TanxInterface::targettedMove(double angle, double dx, double dy, bool shoot
         }
     }
     wSocket.sendTextMessage(str);
+}
+
+bool TanxInterface::isConnected() const
+{
+    return (wSocket.state() == QAbstractSocket::ConnectedState);
 }
 
 void TanxInterface::onConnected()
@@ -219,6 +220,7 @@ void TanxInterface::onTextReceived(QString str)
                         tank.dx *= distinv;
                         tank.dy *= distinv;
                     }
+                    Q_ASSERT(tank.dx * tank.dx + tank.dy * tank.dy < 0.25);
                     val2 = val.toObject().value("a");
                     if (!val2.isUndefined())
                     {
