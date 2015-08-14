@@ -64,34 +64,85 @@ void TanxPlayer::gotUpdate()
         rep.ry += tmp.ry;
         ++bulletIter;
     }
-    /* Moving management */
+    /* Pickables attraction */
+    foreach (const Pickable &pickable, interface->data.pickables)
+    {
+        double dx = pickable.x - x, dy = pickable.y - y;
+        double val = dx * dx + dy * dy;
+        if (val > PICKABLE_IGN_DISTANCE * PICKABLE_IGN_DISTANCE)
+            continue;
+        if (TanxMap::getDuration(x, y, dx, dy) < sqrt(val))
+            continue;
+        val = 1. / val;
+        switch (pickable.t)
+        {
+        case Pickable::Repair:
+            val *= (0.25 * (10 - me.hp)) / me.hp;
+            break;
+        case Pickable::Damage:
+            val *= 0.5;
+            break;
+        case Pickable::Shield:
+            val *= 0.07 * (10 - me.sp);
+            break;
+        }
+        rep.rx += dx * val;
+        rep.ry += dy * val;
+    }
+    /* Following attraction */
+    if (interface->data.tanks.contains(followTank))
+    {
+        const Tank &toFollow = interface->data.tanks.value(followTank);
+        double dx = toFollow.x + toFollow.dx * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED) - x;
+        double dy = toFollow.y + toFollow.dy * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED) - y;
+        double val = 0.7 / sqrt(dx * dx + dy * dy);
+        dx *= val;
+        dy *= val;
+    }
+    /* Shoot ennemies */
+    x += rep.rx * (SHOOT_DELAY_MS * TANK_SPEED / 1000.);
+    y += rep.ry * (SHOOT_DELAY_MS * TANK_SPEED / 1000.);
+    Shoot shoot, bestShoot;
+    bestShoot.dist = 100;
+    bool bestIsLowLife = false;
+    foreach (const Tank &tank, interface->data.tanks)
+    {
+        if (tank.team == interface->data.myTeam)
+            continue;
+        if (sq(x - tank.x) + sq(y - tank.y) > TANK_IGNORE_DISTANCE * TANK_IGNORE_DISTANCE)
+            continue;
+        shoot = TanxMap::getShoot(x, y, tank.x, tank.y, tank.dx, tank.dy);
+        if (tank.id == targetTank)
+        {
+            if (TanxMap::isPossible(x, y, tank.x, tank.y, shoot))
+            {
+                bestShoot = shoot;
+                break;
+            }
+        } else {
+            if ((shoot.dist < bestShoot.dist) && ((!bestIsLowLife) || (tank.hp <= LOW_LIFE)))
+            {
+                bestShoot = shoot;
+                bestIsLowLife = (tank.hp <= LOW_LIFE);
+            }
+        }
+    }
+    /* Moving and shooting interface management */
     double norm = sqrt(rep.rx * rep.rx + rep.ry * rep.ry);
     if (norm == 0)
     {
         if ((lastRep.rx != 0) || (lastRep.ry != 0))
         {
-            //interface->move(0., 0.);
+            interface->targettedMove(bestShoot.angle, 0., 0., bestShoot.dist != 100);
             lastRep = NULL_REPULSION;
+        } else {
+            interface->setTarget(bestShoot.angle, bestShoot.dist != 100);
         }
     } else {
         norm = 1. / norm;
         rep.rx *= norm;
         rep.ry *= norm;
-        //interface->move(rep.rx, rep.ry);
+        interface->targettedMove(bestShoot.angle, rep.rx, rep.ry, bestShoot.dist != 100);
         lastRep = rep;
     }
-    /* Shooting management */
-    x += rep.rx * (SHOOT_DELAY_MS * TANK_SPEED / 1000.);
-    y += rep.ry * (SHOOT_DELAY_MS * TANK_SPEED / 1000.);
-    foreach (const Tank &tank, interface->data.tanks)
-    {
-        if (tank.team == interface->data.myTeam)
-            continue;
-        if (sq(x - tank.x) + sq(y - tank.y) > IGNORE_DISTANCE * IGNORE_DISTANCE)
-            continue;
-        double tx = tank.x + ((DELAY_MS + SHOOT_DELAY_MS) * TANK_SPEED / 1000.) * tank.dx;
-        double ty = tank.y + ((DELAY_MS + SHOOT_DELAY_MS) * TANK_SPEED / 1000.) * tank.dy;
-        // TODO getShoot blabla
-    }
-    // TODO
 }

@@ -68,9 +68,10 @@ public:
     ~TanxInterface();
     void setShooting(bool enabled = true);
     void setTarget(double angle);
+    void setTarget(double angle, bool shootingEnabled);
     void setName(QString userName);
     void move(double dx, double dy);
-    void targettedMove(double angle, double dx, double dy);
+    void targettedMove(double angle, double dx, double dy, bool shootingEnabled);
 signals:
     void initialized();
     void gotUpdate();
@@ -93,6 +94,7 @@ public:
     GameData data;
     bool checkForExpiredBullets;
     bool endedConnection;
+    bool isShooting;
 };
 
 #endif // TANXINTERFACE_H

@@ -8,7 +8,7 @@
 #include <math.h>
 
 TanxInterface::TanxInterface(QObject *parent, bool checkForExpiredBullets)
-    : QObject(parent), checkForExpiredBullets(checkForExpiredBullets), endedConnection(false)
+    : QObject(parent), checkForExpiredBullets(checkForExpiredBullets), endedConnection(false), isShooting(false)
 {
     connect(&wSocket, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(&wSocket, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
@@ -29,11 +29,35 @@ void TanxInterface::setShooting(bool enabled)
         wSocket.sendTextMessage("[\"{\\\"n\\\":\\\"shoot\\\",\\\"d\\\":true}\"]");
     else
         wSocket.sendTextMessage("[\"{\\\"n\\\":\\\"shoot\\\",\\\"d\\\":false}\"]");
+    isShooting = enabled;
 }
 
 void TanxInterface::setTarget(double angle)
 {
     wSocket.sendTextMessage(QStringLiteral("[\"{\\\"n\\\":\\\"target\\\",\\\"d\\\":") + angleToStream(angle) + QStringLiteral("}\"]"));
+}
+
+void TanxInterface::setTarget(double angle, bool shootingEnabled)
+{
+    if (shootingEnabled)
+    {
+        QString str;
+        if (isShooting)
+        {
+            str = QStringLiteral("[\"{\\\"n\\\":\\\"target\\\",\\\"d\\\":") + angleToStream(angle) + QStringLiteral("}\"]");
+        } else {
+            str = QStringLiteral("[\"{\\\"n\\\":\\\"target\\\",\\\"d\\\":") + angleToStream(angle)
+                    + QStringLiteral("}\",\"{\\\"n\\\":\\\"shoot\\\",\\\"d\\\":true}\"]");
+            isShooting = true;
+        }
+        wSocket.sendTextMessage(str);
+    } else {
+        if (isShooting)
+        {
+            wSocket.sendTextMessage("[\"{\\\"n\\\":\\\"shoot\\\",\\\"d\\\":false}\"]");
+            isShooting = false;
+        }
+    }
 }
 
 void TanxInterface::setName(QString userName)
@@ -48,11 +72,33 @@ void TanxInterface::move(double dx, double dy)
     wSocket.sendTextMessage(str);
 }
 
-void TanxInterface::targettedMove(double angle, double dx, double dy)
+void TanxInterface::targettedMove(double angle, double dx, double dy, bool shootingEnabled)
 {
-    QString str = QStringLiteral("[\"{\\\"n\\\":\\\"move\\\",\\\"d\\\":[") + QString::number(dx)
-            + QStringLiteral(",") + QString::number(dy) + QStringLiteral("]}\",\"{\\\"n\\\":\\\"target\\\",\\\"d\\\":")
-            + angleToStream(angle) + QStringLiteral("}\"]");
+    QString str;
+    if (shootingEnabled)
+    {
+        if (isShooting)
+        {
+            str = QStringLiteral("[\"{\\\"n\\\":\\\"move\\\",\\\"d\\\":[") + QString::number(dx)
+                    + QStringLiteral(",") + QString::number(dy) + QStringLiteral("]}\",\"{\\\"n\\\":\\\"target\\\",\\\"d\\\":")
+                    + angleToStream(angle) + QStringLiteral("}\"]");
+        } else {
+            str = QStringLiteral("[\"{\\\"n\\\":\\\"move\\\",\\\"d\\\":[") + QString::number(dx)
+                    + QStringLiteral(",") + QString::number(dy) + QStringLiteral("]}\",\"{\\\"n\\\":\\\"target\\\",\\\"d\\\":")
+                    + angleToStream(angle) + QStringLiteral("}\",\"{\\\"n\\\":\\\"shoot\\\",\\\"d\\\":true}\"]");
+            isShooting = true;
+        }
+    } else {
+        if (isShooting)
+        {
+            str = QStringLiteral("[\"{\\\"n\\\":\\\"move\\\",\\\"d\\\":[") + QString::number(dx)
+                    + QStringLiteral(",") + QString::number(dy) + QStringLiteral("]}\",\"{\\\"n\\\":\\\"shoot\\\",\\\"d\\\":false}\"]");
+            isShooting = false;
+        } else {
+            str = QStringLiteral("[\"{\\\"n\\\":\\\"move\\\",\\\"d\\\":[") + QString::number(dx)
+                    + QStringLiteral(",") + QString::number(dy) + QStringLiteral("]}\"]");
+        }
+    }
     wSocket.sendTextMessage(str);
 }
 
