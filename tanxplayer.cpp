@@ -12,6 +12,7 @@ TanxPlayer::TanxPlayer(TanxInterface *interface, QString myName, QString followN
     QObject::connect(interface, SIGNAL(gotUpdate()), this, SLOT(gotUpdate()), Qt::DirectConnection);
     QObject::connect(interface, SIGNAL(newTank(Tank)), this, SLOT(newTank(Tank)), Qt::DirectConnection);
     QObject::connect(interface, SIGNAL(delTank(int)), this, SLOT(delTank(int)), Qt::DirectConnection);
+    QObject::connect(interface, SIGNAL(newUserName(QString,QString)), this, SLOT(newUserName(QString,QString)), Qt::DirectConnection);
 }
 
 void TanxPlayer::initialized()
@@ -73,6 +74,41 @@ void TanxPlayer::delTank(int id)
         followTank = -1;
     if (id == targetTank)
         targetTank = -1;
+}
+
+void TanxPlayer::newUserName(QString id, QString name)
+{
+    name = name.toLower();
+    if ((followTank < 0) && (name == followName))
+    {
+        foreach (const Tank &tank, interface->data.tanks)
+        {
+            if (tank.owner == id)
+            {
+                followTank = tank.id;
+                if (tank.team == interface->data.myTeam)
+                    return;
+                if ((targetTank < 0) && (name == targetName))
+                    targetTank = tank.id;
+                return;
+            }
+        }
+        return;
+    }
+    if ((targetTank < 0) && (name == targetName))
+    {
+
+        foreach (const Tank &tank, interface->data.tanks)
+        {
+            if (tank.owner == id)
+            {
+                if (tank.team == interface->data.myTeam)
+                    return;
+                targetTank = tank.id;
+                return;
+            }
+        }
+    }
 }
 
 template <typename T> inline T sq(const T &a) { return a * a; }

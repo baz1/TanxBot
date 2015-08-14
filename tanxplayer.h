@@ -27,6 +27,7 @@ public slots:
     void gotUpdate();
     void newTank(const Tank &tank);
     void delTank(int id);
+    void newUserName(QString id, QString name);
 private:
     void playUpdate();
 private:

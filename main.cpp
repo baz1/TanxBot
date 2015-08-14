@@ -19,6 +19,11 @@ int main(int argc, char *argv[])
         if (arg.startsWith("name="))
         {
             tankName = arg.mid(5);
+            if ((tankName.length() < 4) || (tankName.length() > 8))
+            {
+                fprintf(stderr, "Error: Name \"%s\" is either too short (<4) or too long (>8).\n", qPrintable(tankName));
+                return 1;
+            }
             continue;
         }
         if (arg.startsWith("follow="))

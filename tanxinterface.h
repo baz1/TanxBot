@@ -82,6 +82,7 @@ signals:
     void delBullet(int id);
     void newTank(const Tank &tank);
     void delTank(int id);
+    void newUserName(QString id, QString name);
 public slots:
     void endConnection();
 private slots:

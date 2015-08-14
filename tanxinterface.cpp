@@ -20,6 +20,7 @@ TanxInterface::TanxInterface(QObject *parent, bool checkForExpiredBullets)
 
 TanxInterface::~TanxInterface()
 {
+    endedConnection = true;
     wSocket.close();
 }
 
@@ -554,7 +555,13 @@ void TanxInterface::onTextReceived(QString str)
             val = val.toObject().value("name");
             if (!val.isString())
                 goto unknown_msg;
-            data.users[val2.toString()] = val.toString();
+            if (data.users.contains(val2.toString()))
+            {
+                data.users[val2.toString()] = val.toString();
+                emit newUserName(val2.toString(), val.toString());
+            } else {
+                data.users[val2.toString()] = val.toString();
+            }
         } else if (name == "user.remove")
         {
             if (!val.isObject())
