@@ -5,12 +5,16 @@
 #include <QDateTime>
 #include "tanxinterface.h"
 
+#define DELAY_MS_DEFAULT        30
+#define REPULSION_NEGLIGIBLE    0.028
+#define WALL_DIST_IGNORE        2.
+
 struct Repulsion
 {
     double rx, ry;
     bool isNegligible() const
     {
-        return (rx * rx + ry * ry < 0.028);
+        return (rx * rx + ry * ry < REPULSION_NEGLIGIBLE);
     }
 };
 
@@ -25,7 +29,8 @@ private:
 public:
     static bool initialize();
     static double getDuration(double x, double y, double dx, double dy);
-    static Repulsion getTrajectoryRepulsion(double x, double y, const Bullet &bullet, qint64 timestamp = QDateTime::currentMSecsSinceEpoch() + 30);
+    static Repulsion getTrajectoryRepulsion(double x, double y, const Bullet &bullet,
+        qint64 timestamp = QDateTime::currentMSecsSinceEpoch() + DELAY_MS_DEFAULT);
     static Repulsion getBordersRepulsion(double x, double y);
 private:
     static QList<Border> borders;

@@ -109,7 +109,7 @@ Repulsion TanxMap::getBordersRepulsion(double x, double y)
             double rx = x - border.x1;
             double ry = y - border.y1;
             double dist = sqrt(rx * rx + ry * ry);
-            if (dist >= 2.)
+            if (dist >= WALL_DIST_IGNORE)
                 continue;
             dist = 1. / (dist * dist * dist);
             result.rx += rx * dist;
@@ -121,14 +121,14 @@ Repulsion TanxMap::getBordersRepulsion(double x, double y)
             double rx = x - (border.x1 + border.dX);
             double ry = y - (border.y1 + border.dY);
             double dist = sqrt(rx * rx + ry * ry);
-            if (dist >= 2.)
+            if (dist >= WALL_DIST_IGNORE)
                 continue;
             dist = 1. / (dist * dist * dist);
             result.rx += rx * dist;
             result.ry += ry * dist;
             continue;
         }
-        if ((qAbs(beta) * len) >= 2.)
+        if ((qAbs(beta) * len) >= WALL_DIST_IGNORE)
             continue;
         beta = 1. / (beta * beta);
         result.rx += -border.dY * beta;

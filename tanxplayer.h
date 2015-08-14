@@ -4,6 +4,8 @@
 #include "tanxinterface.h"
 #include "tanxmap.h"
 
+#define DELAY_MS 25
+
 class TanxPlayer : public QObject
 {
     Q_OBJECT

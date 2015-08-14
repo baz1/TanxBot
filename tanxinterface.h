@@ -5,6 +5,9 @@
 #include <QMap>
 #include <QWebSocket>
 
+#define BULLET_SPEED    16.
+#define TANK_SPEED      6.
+
 #define TEAM_BLUE   0
 #define TEAM_RED    1
 #define TEAM_GREEN  2

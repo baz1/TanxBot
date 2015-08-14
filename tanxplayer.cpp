@@ -36,7 +36,7 @@ void TanxPlayer::gotUpdate()
     const Tank &me = interface->data.tanks.value(interface->data.myID);
     if (me.dead)
         return;
-    double x = me.x + (30 * 0.006) * lastRep.rx, y = me.y + (30 * 0.006) * lastRep.ry;
+    double x = me.x + (DELAY_MS * TANK_SPEED / 1000.) * lastRep.rx, y = me.y + (DELAY_MS * TANK_SPEED / 1000.) * lastRep.ry;
     /* Border repulsion */
     Repulsion rep = TanxMap::getBordersRepulsion(x, y);
     rep.rx /= 10;
@@ -44,7 +44,7 @@ void TanxPlayer::gotUpdate()
     /* Bullet repulsion */
     QMap<int, Bullet>::iterator bulletIter = interface->data.bullets.begin();
     qint64 now = QDateTime::currentMSecsSinceEpoch();
-    qint64 timestamp = now + 30;
+    qint64 timestamp = now + DELAY_MS;
     while (bulletIter != interface->data.bullets.end())
     {
         if (now >= bulletIter.value().expire)
