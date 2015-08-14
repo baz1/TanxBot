@@ -12,6 +12,7 @@
 #define ANTICIPATE_MOVE         0.5
 #define FOLLOW_DISTANCE         3.
 #define REP_THRESHOLD           0.18
+#define REP_NEGLIGIBLE          0.05
 
 class TanxPlayer : public QObject
 {

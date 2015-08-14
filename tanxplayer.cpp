@@ -143,6 +143,7 @@ void TanxPlayer::playUpdate()
         rep.ry += dy * val;
     }
     /* Discard small moves */
+    printf("rep: (%lf,%lf)\n", rep.rx, rep.ry);
     double norm = sqrt(rep.rx * rep.rx + rep.ry * rep.ry);
     if ((lastRep.rx == 0) && (lastRep.ry == 0))
     {
@@ -156,7 +157,7 @@ void TanxPlayer::playUpdate()
             rep.ry = 0;
         }
     } else {
-        if (rep.rx * lastRep.rx + rep.ry * lastRep.ry < REP_THRESHOLD)
+        if (norm - (rep.rx * lastRep.rx + rep.ry * lastRep.ry) < REP_THRESHOLD)
         {
             rep = lastRep;
         } else {
@@ -179,7 +180,7 @@ void TanxPlayer::playUpdate()
     bool bestIsLowLife = false;
     foreach (const Tank &tank, interface->data.tanks)
     {
-        if (tank.team == interface->data.myTeam)
+        if (tank.dead || (tank.team == interface->data.myTeam))
             continue;
         if (sq(x - tank.x) + sq(y - tank.y) > TANK_IGNORE_DISTANCE * TANK_IGNORE_DISTANCE)
             continue;
@@ -194,8 +195,11 @@ void TanxPlayer::playUpdate()
         } else {
             if ((shoot.dist < bestShoot.dist) && ((!bestIsLowLife) || (tank.hp <= LOW_LIFE)))
             {
-                bestShoot = shoot;
-                bestIsLowLife = (tank.hp <= LOW_LIFE);
+                if (TanxMap::isPossible(x, y, tank.x, tank.y, shoot))
+                {
+                    bestShoot = shoot;
+                    bestIsLowLife = (tank.hp <= LOW_LIFE);
+                }
             }
         }
     }
@@ -207,4 +211,5 @@ void TanxPlayer::playUpdate()
         interface->targettedMove(bestShoot.angle, rep.rx, rep.ry, bestShoot.dist != 100);
     }
     lastRep = rep;
+    printf("lastrep: (%lf,%lf)\n", rep.rx, rep.ry);
 }
