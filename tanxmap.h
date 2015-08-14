@@ -23,6 +23,7 @@ const Repulsion NULL_REPULSION = {0., 0.};
 
 struct Shoot {
     double angle, dist;
+    inline Shoot() {}
     inline Shoot(double angle, double dist) : angle(angle), dist(dist) {}
 };
 

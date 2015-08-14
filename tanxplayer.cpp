@@ -54,7 +54,7 @@ void TanxPlayer::newTank(const Tank &tank)
     QString tankName = interface->data.users.value(tank.owner).toLower();
     if ((followTank < 0) && (tankName == followName))
         followTank = tank.id;
-    if (tank.team == me.team)
+    if (tank.team == interface->data.myTeam)
         return;
     if ((targetTank < 0) && (tankName == targetName))
         targetTank = tank.id;
@@ -133,8 +133,8 @@ void TanxPlayer::playUpdate()
         double dx = toFollow.x + toFollow.dx * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED) - x;
         double dy = toFollow.y + toFollow.dy * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED) - y;
         double val = 0.7 / sqrt(dx * dx + dy * dy);
-        dx *= val;
-        dy *= val;
+        rep.rx += dx * val;
+        rep.ry += dy * val;
     }
     /* Shoot ennemies */
     x += rep.rx * (SHOOT_DELAY_MS * TANK_SPEED / 1000.);

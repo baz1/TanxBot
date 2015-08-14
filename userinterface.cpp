@@ -17,7 +17,7 @@ void intSignalHandler(int sig)
     hIMutex.unlock();
 }
 
-UserInterface::UserInterface(QObject *parent) : QThread(parent), usingUI(false)
+UserInterface::UserInterface(QObject *parent) : QThread(parent), usingUI(false), isAborting(false)
 {
     struct sigaction newSig;
     newSig.sa_handler = intSignalHandler;
@@ -30,6 +30,18 @@ UserInterface::~UserInterface()
     sigaction(SIGINT, &oldSig, NULL);
 }
 
+void UserInterface::abort()
+{
+    if (isRunning())
+    {
+        hIMutex.lock();
+        isAborting = true;
+        hasInterrupt = true;
+        hICondition.wakeOne();
+        hIMutex.unlock();
+    }
+}
+
 void UserInterface::run()
 {
     while (true)
@@ -38,6 +50,8 @@ void UserInterface::run()
         while (!hasInterrupt)
             hICondition.wait(&hIMutex);
         hIMutex.unlock();
+        if (isAborting)
+            return;
         usingUI = true;
         printf("\n");
         printf("  0: Cancel\n");

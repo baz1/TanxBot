@@ -140,7 +140,7 @@ Repulsion TanxMap::getBordersRepulsion(double x, double y)
     return result;
 }
 
-Shoot getShoot(double x, double y, double ex, double ey, double dx, double dy)
+Shoot TanxMap::getShoot(double x, double y, double ex, double ey, double dx, double dy)
 {
     double t1, t2, d1, d2;
     double exx = ex - x, eyy = ey - y;
@@ -148,8 +148,8 @@ Shoot getShoot(double x, double y, double ex, double ey, double dx, double dy)
     if (a == 0)
     {
         t1 = 3.141592653589793238463;
-        Q_ASSERT(b != 0);
-        t2 = 2 * atan(-c / (2 * b));
+        Q_ASSERT(hb != 0);
+        t2 = 2 * atan(-c / (2 * hb));
     } else {
         double delta = hb * hb - a * c;
         Q_ASSERT(delta > 0);

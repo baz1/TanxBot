@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     QString tankName = "guest", followName = "", targetName = "";
     int team = -1;
     QStringList args = QCoreApplication::arguments();
+    args.removeFirst();
     foreach (const QString &arg, args)
     {
         if (arg.startsWith("name="))
@@ -71,9 +72,11 @@ int main(int argc, char *argv[])
         evtLoop.exec();
         if (!tanxPlayer.gotWrongTeam())
             break;
+        userThread.abort();
+        userThread.wait(1000);
         printf("Got wrong team. Retrying in a moment...\n");
         fflush(stdout);
-        QThread::sleep(1);
+        QThread::sleep(2);
     }
     return 0;
 }

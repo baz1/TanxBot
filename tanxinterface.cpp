@@ -484,13 +484,21 @@ void TanxInterface::onTextReceived(QString str)
             if (array.count() != 2)
                 goto unknown_msg;
             val2 = array.at(0);
-            if (!val2.isDouble())
+            if (val2.isNull())
+                tank.x = 0;
+            else if (val2.isDouble())
+                tank.x = val2.toDouble();
+            else
                 goto unknown_msg;
-            tank.x = val2.toDouble();
             val2 = array.at(1);
-            if (!val2.isDouble())
+            if (val2.isNull())
+                tank.y = 0;
+            else if (val2.isDouble())
+                tank.y = val2.toDouble();
+            else
                 goto unknown_msg;
-            tank.y = val2.toDouble();
+            tank.dx = 0;
+            tank.dy = 0;
             val2 = val.toObject().value("hp");
             if (!val2.isDouble())
                 goto unknown_msg;
