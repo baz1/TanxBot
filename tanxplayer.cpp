@@ -136,7 +136,6 @@ void TanxPlayer::playUpdate()
     /* Following attraction */
     if (interface->data.tanks.contains(followTank))
     {
-        printf("a\n");
         const Tank &toFollow = interface->data.tanks.value(followTank);
         double dx = toFollow.x + toFollow.dx * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED) - x;
         double dy = toFollow.y + toFollow.dy * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED) - y;
@@ -146,7 +145,6 @@ void TanxPlayer::playUpdate()
         rep.ry += dy * val;
     }
     /* Discard small moves */
-    printf("rep: (%lf,%lf)\n", rep.rx, rep.ry);
     double norm = sqrt(rep.rx * rep.rx + rep.ry * rep.ry);
     if ((lastRep.rx == 0) && (lastRep.ry == 0))
     {
@@ -214,5 +212,4 @@ void TanxPlayer::playUpdate()
         interface->targettedMove(bestShoot.angle, rep.rx, rep.ry, bestShoot.dist != 100);
     }
     lastRep = rep;
-    printf("lastrep: (%lf,%lf)\n", rep.rx, rep.ry);
 }
