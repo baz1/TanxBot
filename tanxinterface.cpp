@@ -512,7 +512,7 @@ void TanxInterface::onTextReceived(QString str)
             if (!val2.isDouble())
                 goto unknown_msg;
             tank.id = val2.toInt();
-            data.tanks[tank.id] = tank;
+            emit newTank(data.tanks[tank.id] = tank);
             if (tank.owner == data.mySSID)
             {
                 printf("Initialization complete.\n");
@@ -528,6 +528,7 @@ void TanxInterface::onTextReceived(QString str)
             val = val.toObject().value("id");
             if (!val.isDouble())
                 goto unknown_msg;
+            emit delTank(val.toInt());
             data.tanks.remove(val.toInt());
         } else if ((name == "user.add") || (name == "user.name"))
         {

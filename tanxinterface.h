@@ -79,6 +79,8 @@ signals:
     void disconnected();
     void newBullet(int id, const Bullet &bullet);
     void delBullet(int id);
+    void newTank(const Tank &tank);
+    void delTank(int id);
 public slots:
     void endConnection();
 private slots:

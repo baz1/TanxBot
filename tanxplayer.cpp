@@ -3,8 +3,10 @@
 #include <math.h>
 #include <stdio.h>
 
-TanxPlayer::TanxPlayer(TanxInterface *interface, QString myName, int needTeam) : QObject(interface), interface(interface),
-    lastRep(NULL_REPULSION), myName(myName), followTank(-1), targetTank(-1), needTeam(needTeam), wrongTeam(false)
+TanxPlayer::TanxPlayer(TanxInterface *interface, QString myName, QString followName, QString targetName, int needTeam)
+    : QObject(interface), interface(interface), lastRep(NULL_REPULSION),
+      myName(myName), followName(followName.toLower()), targetName(targetName.toLower()),
+      followTank(-1), targetTank(-1), needTeam(needTeam), wrongTeam(false)
 {
     QObject::connect(interface, SIGNAL(initialized()), this, SLOT(initialized()), Qt::DirectConnection);
     QObject::connect(interface, SIGNAL(gotUpdate()), this, SLOT(gotUpdate()), Qt::DirectConnection);
@@ -44,8 +46,26 @@ void TanxPlayer::initialized()
 
 void TanxPlayer::gotUpdate()
 {
-    // TODO
     playUpdate();
+}
+
+void TanxPlayer::newTank(const Tank &tank)
+{
+    QString tankName = interface->data.users.value(tank.owner).toLower();
+    if ((followTank < 0) && (tankName == followName))
+        followTank = tank.id;
+    if (tank.team == me.team)
+        return;
+    if ((targetTank < 0) && (tankName == targetName))
+        targetTank = tank.id;
+}
+
+void TanxPlayer::delTank(int id)
+{
+    if (id == followTank)
+        followTank = -1;
+    if (id == targetTank)
+        targetTank = -1;
 }
 
 template <typename T> inline T sq(const T &a) { return a * a; }
