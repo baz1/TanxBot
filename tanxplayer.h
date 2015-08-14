@@ -15,14 +15,24 @@ class TanxPlayer : public QObject
 {
     Q_OBJECT
 public:
-    explicit TanxPlayer(TanxInterface *interface);
+    explicit TanxPlayer(TanxInterface *interface, QString myName, int needTeam);
+    inline bool gotWrongTeam() const;
 public slots:
     void initialized();
     void gotUpdate();
 private:
+    void playUpdate();
+private:
     TanxInterface *interface;
     Repulsion lastRep;
-    int followTank, targetTank;
+    QString myName;
+    int followTank, targetTank, needTeam;
+    bool wrongTeam;
 };
+
+inline bool TanxPlayer::gotWrongTeam() const
+{
+    return wrongTeam;
+}
 
 #endif // TANXPLAYER_H

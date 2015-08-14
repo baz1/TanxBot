@@ -3,7 +3,8 @@
 #include <math.h>
 #include <stdio.h>
 
-TanxPlayer::TanxPlayer(TanxInterface *interface) : QObject(interface), interface(interface), lastRep(NULL_REPULSION)
+TanxPlayer::TanxPlayer(TanxInterface *interface, QString myName, int needTeam) : QObject(interface), interface(interface),
+    lastRep(NULL_REPULSION), myName(myName), followTank(-1), targetTank(-1), needTeam(needTeam), wrongTeam(false)
 {
     QObject::connect(interface, SIGNAL(initialized()), this, SLOT(initialized()), Qt::DirectConnection);
     QObject::connect(interface, SIGNAL(gotUpdate()), this, SLOT(gotUpdate()), Qt::DirectConnection);
@@ -12,28 +13,44 @@ TanxPlayer::TanxPlayer(TanxInterface *interface) : QObject(interface), interface
 void TanxPlayer::initialized()
 {
     const Tank &me = interface->data.tanks.value(interface->data.myID);
-    switch (me.team)
+    if (needTeam >= 0)
     {
-    case TEAM_BLUE:
-        printf("Team: blue\n");
-        break;
-    case TEAM_GREEN:
-        printf("Team: green\n");
-        break;
-    case TEAM_RED:
-        printf("Team: red\n");
-        break;
-    case TEAM_YELLOW:
-        printf("Team: yellow\n");
-        break;
+        if (me.team != needTeam)
+        {
+            wrongTeam = true;
+            interface->endConnection();
+            return;
+        }
+    } else {
+        switch (me.team)
+        {
+        case TEAM_BLUE:
+            printf("Team: blue\n");
+            break;
+        case TEAM_GREEN:
+            printf("Team: green\n");
+            break;
+        case TEAM_RED:
+            printf("Team: red\n");
+            break;
+        case TEAM_YELLOW:
+            printf("Team: yellow\n");
+            break;
+        }
+        fflush(stdout);
     }
-    fflush(stdout);
-    interface->setName("AAAA");
+    interface->setName(myName);
+}
+
+void TanxPlayer::gotUpdate()
+{
+    // TODO
+    playUpdate();
 }
 
 template <typename T> inline T sq(const T &a) { return a * a; }
 
-void TanxPlayer::gotUpdate()
+void TanxPlayer::playUpdate()
 {
     const Tank &me = interface->data.tanks.value(interface->data.myID);
     if (me.dead)
