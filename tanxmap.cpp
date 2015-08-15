@@ -131,7 +131,8 @@ Repulsion TanxMap::getBordersRepulsion(double x, double y)
             result.ry += ry * dist;
             continue;
         }
-        if ((qAbs(beta) * len) >= WALL_DIST_IGNORE)
+        beta = qAbs(beta);
+        if ((beta * len) >= WALL_DIST_IGNORE)
             continue;
         beta = 1. / (beta * len * len);
         result.rx += -border.dY * beta;
