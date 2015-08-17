@@ -214,3 +214,22 @@ bool TanxMap::isPossible(double x, double y, double ex, double ey, Shoot shoot)
     dy /= dist;
     return (getDuration(ex, ey, dx, dy) > dist);
 }
+
+Repulsion TanxMap::getAttraction(double x, double y, double tx, double ty)
+{
+    foreach (const MapZone &zone, mapZones)
+    {
+        if ((x >= zone.x1) && (y >= zone.y1) && (x <= zone.x2) && (y <= zone.y2))
+        {
+            if ((tx >= zone.x1) && (ty >= zone.y1) && (tx <= zone.x2) && (ty <= zone.y2))
+                return Repulsion(tx - x, ty - y);
+            foreach (const TargetZone &targetZone, zone.targetZones)
+            {
+                if ((tx >= targetZone.x1) && (ty >= targetZone.y1) && (tx <= targetZone.x2) && (ty <= targetZone.y2))
+                    return Repulsion(targetZone.tx - x, targetZone.ty - y);
+            }
+            return Repulsion(zone.default_tx - x, zone.default_ty - y);
+        }
+    }
+    return Repulsion(tx - x, ty - y);
+}

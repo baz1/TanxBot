@@ -17,6 +17,8 @@ struct Repulsion
     {
         return (rx * rx + ry * ry < REPULSION_NEGLIGIBLE);
     }
+    inline Repulsion() {}
+    inline Repulsion(double rx, double ry) : rx(rx), ry(ry) {}
 };
 
 const Repulsion NULL_REPULSION = {0., 0.};
@@ -50,6 +52,7 @@ public:
     static Repulsion getBordersRepulsion(double x, double y);
     static Shoot getShoot(double x, double y, double ex, double ey, double dx, double dy);
     static bool isPossible(double x, double y, double ex, double ey, Shoot shoot);
+    static Repulsion getAttraction(double x, double y, double tx, double ty);
 private:
     static QList<Border> borders;
     static QList<MapZone> mapZones;
