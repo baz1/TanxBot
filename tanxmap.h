@@ -33,6 +33,15 @@ private:
     struct Border {
         int x1, y1, dX, dY;
     };
+    struct TargetZone {
+        int x1, y1, x2, y2;
+        int tx, ty;
+    };
+    struct MapZone {
+        int x1, y1, x2, y2;
+        QList<TargetZone> targetZones;
+        int default_tx, default_ty;
+    };
 public:
     static bool initialize();
     static double getDuration(double x, double y, double dx, double dy);
@@ -43,6 +52,7 @@ public:
     static bool isPossible(double x, double y, double ex, double ey, Shoot shoot);
 private:
     static QList<Border> borders;
+    static QList<MapZone> mapZones;
 };
 
 #endif // TANXMAP_H

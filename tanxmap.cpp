@@ -19,12 +19,29 @@ bool TanxMap::initialize()
         fscanf(mapFile, "%d", &border.x1);
         if (border.x1 < 0)
             break;
-        fscanf(mapFile, "%d", &border.y1);
-        fscanf(mapFile, "%d", &border.dX);
+        fscanf(mapFile, "%d%d%d", &border.y1, &border.dX, &border.dY);
         border.dX -= border.x1;
-        fscanf(mapFile, "%d", &border.dY);
         border.dY -= border.y1;
         borders.append(border);
+    }
+    while (true)
+    {
+        MapZone zone;
+        fscanf(mapFile, "%d", &zone.x1);
+        if (zone.x1 < 0)
+            break;
+        fscanf(mapFile, "%d%d%d", &zone.y1, &zone.x2, &zone.y2);
+        while (true)
+        {
+            TargetZone targetZone;
+            fscanf(mapFile, "%d", &targetZone.x1);
+            if (targetZone.x1 < 0)
+                break;
+            fscanf(mapFile, "%d%d%d", &targetZone.y1, &targetZone.x2, &targetZone.y2);
+            fscanf(mapFile, "%d%d", &targetZone.tx, &targetZone.ty);
+        }
+        fscanf(mapFile, "%d%d", &zone.default_tx, &zone.default_ty);
+        mapZones.append(zone);
     }
     fclose(mapFile);
     return true;
