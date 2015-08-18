@@ -48,6 +48,20 @@ bool TanxMap::initialize()
     return true;
 }
 
+void TanxMap::initPickables(Pickable *ptr)
+{
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    ptr[0] = Pickable(Pickable::Repair, 9.5, 24.5, now);
+    ptr[1] = Pickable(Pickable::Repair, 23.5, 9.5, now);
+    ptr[2] = Pickable(Pickable::Repair, 38.5, 23.5, now);
+    ptr[3] = Pickable(Pickable::Repair, 24.5, 38.5, now);
+    ptr[4] = Pickable(Pickable::Damage, 13.5, 15.5, now);
+    ptr[5] = Pickable(Pickable::Damage, 32.5, 13.5, now);
+    ptr[6] = Pickable(Pickable::Damage, 34.5, 32.5, now);
+    ptr[7] = Pickable(Pickable::Damage, 15.5, 34.5, now);
+    ptr[8] = Pickable(Pickable::Shield, 24, 24, now);
+}
+
 double TanxMap::getDuration(double x, double y, double dx, double dy)
 {
     double duration = 1000, det, d1, d2, alpha, beta;
@@ -214,6 +228,15 @@ bool TanxMap::isPossible(double x, double y, double ex, double ey, Shoot shoot)
     dx /= dist;
     dy /= dist;
     return (getDuration(ex, ey, dx, dy) > dist);
+}
+
+Repulsion TanxMap::getUnitAttraction(double x, double y, double tx, double ty)
+{
+    Repulsion result = getAttraction(x, y, tx, ty);
+    double dist = sqrt(result.rx * result.rx + result.ry * result.ry);
+    result.rx /= dist;
+    result.ry /= dist;
+    return result;
 }
 
 Repulsion TanxMap::getAttraction(double x, double y, double tx, double ty)

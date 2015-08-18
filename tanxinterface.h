@@ -13,6 +13,10 @@
 #define TEAM_GREEN  2
 #define TEAM_YELLOW 3
 
+#define RESPAWN_REPAIR      5000
+#define RESPAWN_DAMAGE      5000
+#define RESPAWN_SHIELD      15000
+
 struct Tank
 {
     int id;
@@ -30,13 +34,33 @@ struct Tank
 
 struct Pickable
 {
-    enum {
-        Repair,
-        Damage,
-        Shield
+    enum PickableType {
+        Repair = 0,
+        Damage = 1,
+        Shield = 2
     } t;
-    double r;
     double x, y;
+    qint64 respawn_timestamp;
+    inline Pickable() {}
+    inline Pickable(PickableType t, double x, double y, qint64 now) : t(t), x(x), y(y)
+    {
+        init(now);
+    }
+    inline void init(qint64 now)
+    {
+        switch (t)
+        {
+        case Repair:
+            respawn_timestamp = now + RESPAWN_REPAIR;
+            return;
+        case Damage:
+            respawn_timestamp = now + RESPAWN_DAMAGE;
+            return;
+        case Shield:
+            respawn_timestamp = now + RESPAWN_SHIELD;
+            return;
+        }
+    }
 };
 
 struct Bullet
@@ -56,8 +80,9 @@ struct GameData
     QMap<int, Tank> tanks;
     int myID, myTeam;
     int teamScores[4];
-    QMap<int, Pickable> pickables;
+    QMap<int, int> currentPickables;
     QMap<int, Bullet> bullets;
+    Pickable pickables[9];
 };
 
 class TanxInterface : public QObject

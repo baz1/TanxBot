@@ -7,12 +7,13 @@
 #define DELAY_MS                25
 #define SHOOT_DELAY_MS          25
 #define TANK_IGNORE_DISTANCE    15.
-#define PICKABLE_IGN_DISTANCE   15.
+#define PICKABLE_IGN_DISTANCE   20.
 #define LOW_LIFE                3
 #define ANTICIPATE_MOVE         0.5
 #define FOLLOW_DISTANCE         3.
 #define REP_THRESHOLD           0.18
 #define REP_NEGLIGIBLE          0.05
+#define DIST_CROW_FLIES_RATIO   1.4
 
 class TanxPlayer : public QObject
 {

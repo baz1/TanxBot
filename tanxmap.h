@@ -46,12 +46,15 @@ private:
     };
 public:
     static bool initialize();
+    static void initPickables(Pickable *ptr);
     static double getDuration(double x, double y, double dx, double dy);
     static Repulsion getTrajectoryRepulsion(double x, double y, const Bullet &bullet,
         qint64 timestamp = QDateTime::currentMSecsSinceEpoch() + DELAY_MS_DEFAULT);
     static Repulsion getBordersRepulsion(double x, double y);
     static Shoot getShoot(double x, double y, double ex, double ey, double dx, double dy);
     static bool isPossible(double x, double y, double ex, double ey, Shoot shoot);
+    static Repulsion getUnitAttraction(double x, double y, double tx, double ty);
+private:
     static Repulsion getAttraction(double x, double y, double tx, double ty);
 private:
     static QList<Border> borders;

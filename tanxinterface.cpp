@@ -15,6 +15,7 @@ TanxInterface::TanxInterface(QObject *parent, bool checkForExpiredBullets)
     connect(&wSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onError(QAbstractSocket::SocketError)));
     connect(&wSocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onTextReceived(QString)));
     data.myID = -1;
+    TanxMap::initPickables(data.pickables);
     wSocket.open(QUrl("wss://tanx.playcanvas.com/socket/520/xkzs4vvy/websocket"));
 }
 
@@ -143,8 +144,8 @@ void TanxInterface::onTextReceived(QString str)
     QJsonValue val, val2;
     QJsonArray array;
     Tank tank;
-    Pickable pickable;
     Bullet bullet;
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
     if (str.startsWith("a[\"") && str.endsWith("\"]"))
     {
         str = str.mid(3, str.length() - 5);
@@ -285,37 +286,26 @@ void TanxInterface::onTextReceived(QString str)
                     val = array.at(--index);
                     if (!val.isObject())
                         goto unknown_msg;
-                    val2 = val.toObject().value("t");
-                    if (!val2.isString())
-                        goto unknown_msg;
-                    if (val2.toString() == "damage")
-                    {
-                        pickable.t = Pickable::Damage;
-                    } else if (val2.toString() == "repair")
-                    {
-                        pickable.t = Pickable::Repair;
-                    } else if (val2.toString() == "shield")
-                    {
-                        pickable.t = Pickable::Shield;
-                    } else {
-                        goto unknown_msg;
-                    }
-                    val2 = val.toObject().value("r");
-                    if (!val2.isDouble())
-                        goto unknown_msg;
-                    pickable.r = val2.toDouble();
                     val2 = val.toObject().value("x");
                     if (!val2.isDouble())
                         goto unknown_msg;
-                    pickable.x = val2.toDouble();
+                    int px = val2.toDouble();
                     val2 = val.toObject().value("y");
                     if (!val2.isDouble())
                         goto unknown_msg;
-                    pickable.y = val2.toDouble();
+                    int py = val2.toDouble();
+                    for (index = 0; index < 9; ++index)
+                    {
+                        if ((data.pickables[index].x == px) && (data.pickables[index].y == py))
+                            break;
+                    }
+                    if (index == 9)
+                        goto unknown_msg;
+                    data.pickables[index].respawn_timestamp = now;
                     val2 = val.toObject().value("id");
                     if (!val2.isDouble())
                         goto unknown_msg;
-                    data.pickables[val2.toInt()] = pickable;
+                    data.currentPickables[val2.toInt()] = index;
                 }
             }
             obj.remove("pickable");
@@ -333,7 +323,7 @@ void TanxInterface::onTextReceived(QString str)
                     val2 = val.toObject().value("id");
                     if (!val2.isDouble())
                         goto unknown_msg;
-                    data.pickables.remove(val2.toInt());
+                    data.pickables[data.currentPickables.take(val2.toInt())].init(now);
                 }
             }
             obj.remove("pickableDelete");
@@ -389,7 +379,7 @@ void TanxInterface::onTextReceived(QString str)
                     bullet.dx /= len;
                     bullet.dy /= len;
                     bullet.duration = TanxMap::getDuration(bullet.x, bullet.y, bullet.dx, bullet.dy);
-                    bullet.launched = QDateTime::currentMSecsSinceEpoch();
+                    bullet.launched = now;
                     bullet.expire = bullet.launched + (qint64) (bullet.duration * 1000. / BULLET_SPEED);
                     emit newBullet(val2.toInt(), data.bullets[val2.toInt()] = bullet);
                 }
@@ -416,7 +406,6 @@ void TanxInterface::onTextReceived(QString str)
             if (checkForExpiredBullets)
             {
                 QMap<int, Bullet>::iterator bulletIter = data.bullets.begin();
-                qint64 now = QDateTime::currentMSecsSinceEpoch();
                 while (bulletIter != data.bullets.end())
                 {
                     if (now >= bulletIter.value().expire)

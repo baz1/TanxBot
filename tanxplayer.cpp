@@ -145,40 +145,46 @@ void TanxPlayer::playUpdate()
         ++bulletIter;
     }
     /* Pickables attraction */
-    foreach (const Pickable &pickable, interface->data.pickables)
+    for (int i = 0; i < 9; ++i)
     {
+        const Pickable &pickable = interface->data.pickables[i];
         double dx = pickable.x - x, dy = pickable.y - y;
         double val = dx * dx + dy * dy;
         if (val > PICKABLE_IGN_DISTANCE * PICKABLE_IGN_DISTANCE)
             continue;
-        if (TanxMap::getDuration(x, y, dx, dy) < sqrt(val))
-            continue;
+        val = sqrt(val);
+        val = qMax(val * DIST_CROW_FLIES_RATIO, (TANK_SPEED / 1000.) * qMax(0., (double) (pickable.respawn_timestamp - now)));
         val = 1. / val;
         switch (pickable.t)
         {
         case Pickable::Repair:
-            val *= (0.25 * (10 - me.hp)) / me.hp;
+            val *= (0.3 * (10 - me.hp)) / me.hp;
             break;
         case Pickable::Damage:
             val *= 0.5;
             break;
         case Pickable::Shield:
-            val *= 0.07 * (10 - me.sp);
+            val *= 0.09 * (10 - me.sp);
             break;
         }
-        rep.rx += dx * val;
-        rep.ry += dy * val;
+        Repulsion tmp = TanxMap::getUnitAttraction(x, y, pickable.x, pickable.y);
+        rep.rx += tmp.rx * val;
+        rep.ry += tmp.ry * val;
     }
     /* Following attraction */
     if (interface->data.tanks.contains(followTank))
     {
         const Tank &toFollow = interface->data.tanks.value(followTank);
-        double dx = toFollow.x + toFollow.dx * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED) - x;
-        double dy = toFollow.y + toFollow.dy * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED) - y;
+        double tx = toFollow.x + toFollow.dx * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED);
+        double ty = toFollow.y + toFollow.dy * (ANTICIPATE_MOVE * BULLET_SPEED / TANK_SPEED);
+        double dx = tx - x, dy = ty - y;
         double val = sqrt(dx * dx + dy * dy);
-        val = 0.2 * (val > 3. + FOLLOW_DISTANCE ? 0.6 : val - FOLLOW_DISTANCE) / val;
-        rep.rx += dx * val;
-        rep.ry += dy * val;
+        if ((val > FOLLOW_DISTANCE) || (TanxMap::getDuration(x, y, dx / val, dy / val) <= val))
+        {
+            Repulsion tmp = TanxMap::getUnitAttraction(x, y, tx, ty);
+            rep.rx += tmp.rx * 0.4;
+            rep.ry += tmp.ry * 0.4;
+        }
     }
     /* Discard small moves */
     double norm = sqrt(rep.rx * rep.rx + rep.ry * rep.ry);
