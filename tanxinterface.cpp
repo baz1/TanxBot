@@ -296,7 +296,7 @@ void TanxInterface::onTextReceived(QString str)
                     double py = val2.toDouble();
                     for (index2 = 0; index2 < 9; ++index2)
                     {
-                        if ((data.pickables[index].x == px) && (data.pickables[index].y == py))
+                        if ((data.pickables[index2].x == px) && (data.pickables[index2].y == py))
                             break;
                     }
                     if (index2 == 9)
