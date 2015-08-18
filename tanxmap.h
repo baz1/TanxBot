@@ -21,7 +21,7 @@ struct Repulsion
     inline Repulsion(double rx, double ry) : rx(rx), ry(ry) {}
 };
 
-const Repulsion NULL_REPULSION = {0., 0.};
+const Repulsion NULL_REPULSION = Repulsion(0, 0);
 
 struct Shoot {
     double angle, dist;

@@ -4,6 +4,7 @@
 #include <math.h>
 
 QList<TanxMap::Border> TanxMap::borders;
+QList<TanxMap::MapZone> TanxMap::mapZones;
 
 bool TanxMap::initialize()
 {
@@ -82,8 +83,8 @@ Repulsion TanxMap::getTrajectoryRepulsion(double x, double y, const Bullet &bull
     {
         result.rx = x - (bullet.x + bullet.dx * spent);
         result.ry = y - (bullet.y + bullet.dy * spent);
-        double dist = sqrt(result.rx * result.rx + result.ry * result.ry);
-        dist = 1. / (dist * dist * dist);
+        double dist = result.rx * result.rx + result.ry * result.ry;
+        dist = 1. / (dist * dist);
         result.rx *= dist;
         result.ry *= dist;
         return result;
@@ -92,15 +93,15 @@ Repulsion TanxMap::getTrajectoryRepulsion(double x, double y, const Bullet &bull
     {
         result.rx = x - (bullet.x + bullet.dx * bullet.duration);
         result.ry = y - (bullet.y + bullet.dy * bullet.duration);
-        double dist = sqrt(result.rx * result.rx + result.ry * result.ry);
-        dist = 1. / (dist * dist * dist);
+        double dist = result.rx * result.rx + result.ry * result.ry;
+        dist = 1. / (dist * dist);
         result.rx *= dist;
         result.ry *= dist;
         return result;
     }
     double beta = (x - bullet.x) * bullet.dy + (bullet.y - y) * bullet.dx;
     bool neg = (beta > 0);
-    beta = 1. / (beta * beta);
+    beta = 1. / qAbs(beta * beta * beta);
     if (neg)
     {
         result.rx = bullet.dy * beta;
