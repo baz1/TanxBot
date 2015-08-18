@@ -137,7 +137,7 @@ void TanxInterface::onError(QAbstractSocket::SocketError error)
 
 void TanxInterface::onTextReceived(QString str)
 {
-    int index;
+    int index, index2;
     QString name;
     QJsonDocument doc;
     QJsonObject obj;
@@ -289,17 +289,17 @@ void TanxInterface::onTextReceived(QString str)
                     val2 = val.toObject().value("x");
                     if (!val2.isDouble())
                         goto unknown_msg;
-                    int px = val2.toDouble();
+                    double px = val2.toDouble();
                     val2 = val.toObject().value("y");
                     if (!val2.isDouble())
                         goto unknown_msg;
-                    int py = val2.toDouble();
-                    for (index = 0; index < 9; ++index)
+                    double py = val2.toDouble();
+                    for (index2 = 0; index2 < 9; ++index2)
                     {
                         if ((data.pickables[index].x == px) && (data.pickables[index].y == py))
                             break;
                     }
-                    if (index == 9)
+                    if (index2 == 9)
                         goto unknown_msg;
                     data.pickables[index].respawn_timestamp = now;
                     val2 = val.toObject().value("id");
