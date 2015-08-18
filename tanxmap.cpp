@@ -40,6 +40,7 @@ bool TanxMap::initialize()
                 break;
             fscanf(mapFile, "%d%d%d", &targetZone.y1, &targetZone.x2, &targetZone.y2);
             fscanf(mapFile, "%d%d", &targetZone.tx, &targetZone.ty);
+            zone.targetZones.append(targetZone);
         }
         fscanf(mapFile, "%d%d", &zone.default_tx, &zone.default_ty);
         mapZones.append(zone);
