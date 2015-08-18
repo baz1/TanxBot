@@ -62,6 +62,19 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Error: Unrecognized team \"%s\".\n", qPrintable(teamName));
             return 1;
         }
+        if (arg.startsWith("way="))
+        {
+            QStringList coords = arg.mid(4).split(QChar(','));
+            if (coords.length() != 4)
+            {
+                fprintf(stderr, "Error: Wrong number of coordinates.\n");
+                return 1;
+            }
+            Repulsion attr = TanxMap::getUnitAttraction(coords.at(0).toDouble(), coords.at(1).toDouble(),
+                                                        coords.at(2).toDouble(), coords.at(3).toDouble());
+            printf("%lf %lf\n", attr.rx, attr.ry);
+            return 0;
+        }
         fprintf(stderr, "Error: Unrecognized option \"%s\".\n", qPrintable(arg));
         return 1;
     }
