@@ -161,10 +161,10 @@ void TanxPlayer::playUpdate()
             val *= (0.3 * (10 - me.hp)) / me.hp;
             break;
         case Pickable::Damage:
-            val *= 0.3;
+            val *= 0.5;
             break;
         case Pickable::Shield:
-            val *= 0.06 * (10 - me.sp);
+            val *= 0.07 * (10 - me.sp);
             break;
         }
         Repulsion tmp = TanxMap::getUnitAttraction(x, y, pickable.x, pickable.y);
