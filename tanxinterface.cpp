@@ -305,7 +305,7 @@ void TanxInterface::onTextReceived(QString str)
                     val2 = val.toObject().value("id");
                     if (!val2.isDouble())
                         goto unknown_msg;
-                    data.currentPickables[val2.toInt()] = index;
+                    data.currentPickables[val2.toInt()] = index2;
                 }
             }
             obj.remove("pickable");
