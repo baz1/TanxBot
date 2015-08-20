@@ -64,7 +64,10 @@ int main(int argc, char *argv[])
             return 1;
         }
         if (arg == "off")
+        {
             startOff = true;
+            continue;
+        }
         if (arg.startsWith("way="))
         {
             QStringList coords = arg.mid(4).split(QChar(','));
