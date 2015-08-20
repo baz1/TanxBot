@@ -7,6 +7,7 @@
 
 class UserInterface : public QThread
 {
+    Q_OBJECT
 public:
     UserInterface(QObject *parent = NULL);
     ~UserInterface();
@@ -14,7 +15,7 @@ public:
 signals:
     void setActivated(bool enabled);
 protected:
-    void run();
+    void run() Q_DECL_OVERRIDE;
 public:
     bool usingUI;
 private:
