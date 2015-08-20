@@ -29,6 +29,7 @@ public slots:
     void newTank(const Tank &tank);
     void delTank(int id);
     void newUserName(QString id, QString name);
+    void setActivated(bool enabled);
 private:
     void playUpdate();
 private:
@@ -36,7 +37,7 @@ private:
     Repulsion lastRep;
     QString myName, followName, targetName;
     int followTank, targetTank, needTeam;
-    bool wrongTeam;
+    bool wrongTeam, active;
 };
 
 inline bool TanxPlayer::gotWrongTeam() const

@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     int team = -1;
     QStringList args = QCoreApplication::arguments();
     args.removeFirst();
+    bool startOff = false;
     foreach (const QString &arg, args)
     {
         if (arg.startsWith("name="))
@@ -62,6 +63,8 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Error: Unrecognized team \"%s\".\n", qPrintable(teamName));
             return 1;
         }
+        if (arg == "off")
+            startOff = true;
         if (arg.startsWith("way="))
         {
             QStringList coords = arg.mid(4).split(QChar(','));
@@ -79,10 +82,10 @@ int main(int argc, char *argv[])
         return 1;
     }
     TanxInterface *tanxInterface;
+    TanxPlayer* lastPlayer;
     QEventLoop evtLoop;
     {
         QList<TanxInterface*> interfaces;
-        TanxPlayer* lastPlayer;
         while (true)
         {
             interfaces.append(new TanxInterface(NULL, false));
@@ -104,7 +107,10 @@ int main(int argc, char *argv[])
         delete tanxInterface;
         return 1;
     }
+    if (startOff)
+        lastPlayer->setActivated(false);
     UserInterface userInterface;
+    QObject::connect(&userInterface, SIGNAL(setActivated(bool)), lastPlayer, SLOT(setActivated(bool)));
     QObject::connect(tanxInterface, SIGNAL(disconnected()), &evtLoop, SLOT(quit()));
     QObject::connect(&userInterface, SIGNAL(finished()), tanxInterface, SLOT(endConnection()));
     userInterface.start();

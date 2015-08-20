@@ -6,7 +6,7 @@
 TanxPlayer::TanxPlayer(TanxInterface *interface, QString myName, QString followName, QString targetName, int needTeam)
     : QObject(interface), interface(interface), lastRep(NULL_REPULSION),
       myName(myName), followName(followName.toLower()), targetName(targetName.toLower()),
-      followTank(-1), targetTank(-1), needTeam(needTeam), wrongTeam(false)
+      followTank(-1), targetTank(-1), needTeam(needTeam), wrongTeam(false), active(true)
 {
     QObject::connect(interface, SIGNAL(initialized()), this, SLOT(initialized()), Qt::DirectConnection);
     QObject::connect(interface, SIGNAL(gotUpdate()), this, SLOT(gotUpdate()), Qt::DirectConnection);
@@ -108,6 +108,22 @@ void TanxPlayer::newUserName(QString id, QString name)
                 return;
             }
         }
+    }
+}
+
+void TanxPlayer::setActivated(bool enabled)
+{
+    if (active == enabled)
+    {
+        if (enabled)
+        {
+            interface->setName(myName);
+            printf("Activated.\n");
+        } else {
+            interface->setName("guest");
+            printf("Deactivated.\n");
+        }
+        active = enabled;
     }
 }
 

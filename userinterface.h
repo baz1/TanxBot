@@ -11,6 +11,8 @@ public:
     UserInterface(QObject *parent = NULL);
     ~UserInterface();
     void abort();
+signals:
+    void setActivated(bool enabled);
 protected:
     void run();
 public:

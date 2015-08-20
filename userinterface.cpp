@@ -56,6 +56,8 @@ void UserInterface::run()
         usingUI = true;
         printf("\n");
         printf("  0: Cancel\n");
+        printf("  1: Activate\n");
+        printf("  2: Deactivate\n");
         printf("  9: Exit\n");
         int action = -1;
         while (action)
@@ -66,6 +68,12 @@ void UserInterface::run()
             switch (action)
             {
             case 0:
+                break;
+            case 1:
+                emit setActivated(true);
+                break;
+            case 2:
+                emit setActivated(false);
                 break;
             case 9:
                 return;
