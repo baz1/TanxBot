@@ -115,15 +115,16 @@ void TanxPlayer::setActivated(bool enabled)
 {
     if (active != enabled)
     {
+        active = enabled;
         if (enabled)
         {
             interface->setName(myName);
             printf("Activated.\n");
         } else {
             interface->setName("guest");
+            interface->targettedMove(0, 0, 0, false);
             printf("Deactivated.\n");
         }
-        active = enabled;
     }
 }
 
