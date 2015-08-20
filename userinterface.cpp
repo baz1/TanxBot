@@ -71,9 +71,11 @@ void UserInterface::run()
                 break;
             case 1:
                 emit setActivated(true);
+                action = 0;
                 break;
             case 2:
                 emit setActivated(false);
+                action = 0;
                 break;
             case 9:
                 return;

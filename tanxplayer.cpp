@@ -52,7 +52,7 @@ void TanxPlayer::initialized()
 
 void TanxPlayer::gotUpdate()
 {
-    if (wrongTeam)
+    if (wrongTeam || (!active))
         return;
     playUpdate();
 }
@@ -113,7 +113,7 @@ void TanxPlayer::newUserName(QString id, QString name)
 
 void TanxPlayer::setActivated(bool enabled)
 {
-    if (active == enabled)
+    if (active != enabled)
     {
         if (enabled)
         {
