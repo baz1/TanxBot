@@ -128,6 +128,41 @@ void TanxPlayer::setActivated(bool enabled)
     }
 }
 
+void TanxPlayer::setMyName(QString name)
+{
+    myName = name;
+    if (active)
+        interface->setName(myName);
+}
+
+void TanxPlayer::setFollowName(QString name)
+{
+    followTank = -1;
+    followName = name;
+    foreach (const Tank &tank, interface->data.tanks)
+    {
+        if (interface->data.users.value(tank.owner) == followName)
+        {
+            followTank = tank.id;
+            return;
+        }
+    }
+}
+
+void TanxPlayer::setTargetName(QString name)
+{
+    targetTank = -1;
+    targetName = name;
+    foreach (const Tank &tank, interface->data.tanks)
+    {
+        if (interface->data.users.value(tank.owner) == targetName)
+        {
+            targetTank = tank.id;
+            return;
+        }
+    }
+}
+
 template <typename T> inline T sq(const T &a) { return a * a; }
 
 void TanxPlayer::playUpdate()

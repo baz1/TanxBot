@@ -10,7 +10,7 @@
 #define PICKABLE_IGN_DISTANCE   20.
 #define LOW_LIFE                3
 #define ANTICIPATE_MOVE         0.5
-#define FOLLOW_DISTANCE         3.
+#define FOLLOW_DISTANCE         6.
 #define REP_THRESHOLD           0.18
 #define REP_NEGLIGIBLE          0.05
 #define DIST_CROW_FLIES_RATIO   1.4
@@ -30,6 +30,9 @@ public slots:
     void delTank(int id);
     void newUserName(QString id, QString name);
     void setActivated(bool enabled);
+    void setMyName(QString name);
+    void setFollowName(QString name);
+    void setTargetName(QString name);
 private:
     void playUpdate();
 private:

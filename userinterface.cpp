@@ -7,6 +7,7 @@ volatile bool hasInterrupt = false;
 QMutex hIMutex;
 QWaitCondition hICondition;
 
+char buffer[10];
 
 void intSignalHandler(int sig)
 {
@@ -58,6 +59,9 @@ void UserInterface::run()
         printf("  0: Cancel\n");
         printf("  1: Activate\n");
         printf("  2: Deactivate\n");
+        printf("  3: Set my name\n");
+        printf("  4: Set follow name\n");
+        printf("  5: Set target name\n");
         printf("  9: Exit\n");
         int action = -1;
         while (action)
@@ -75,6 +79,27 @@ void UserInterface::run()
                 break;
             case 2:
                 emit setActivated(false);
+                action = 0;
+                break;
+            case 3:
+                printf("Name: ");
+                fflush(stdout);
+                fgets(buffer, 10, stdin);
+                emit setMyName(QString(buffer));
+                action = 0;
+                break;
+            case 4:
+                printf("Name: ");
+                fflush(stdout);
+                fgets(buffer, 10, stdin);
+                emit setFollowName(QString(buffer));
+                action = 0;
+                break;
+            case 5:
+                printf("Name: ");
+                fflush(stdout);
+                fgets(buffer, 10, stdin);
+                emit setTargetName(QString(buffer));
                 action = 0;
                 break;
             case 9:

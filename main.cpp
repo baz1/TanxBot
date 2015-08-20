@@ -114,6 +114,9 @@ int main(int argc, char *argv[])
         lastPlayer->setActivated(false);
     UserInterface userInterface;
     QObject::connect(&userInterface, SIGNAL(setActivated(bool)), lastPlayer, SLOT(setActivated(bool)));
+    QObject::connect(&userInterface, SIGNAL(setMyName(QString)), lastPlayer, SLOT(setMyName(QString)));
+    QObject::connect(&userInterface, SIGNAL(setFollowName(QString)), lastPlayer, SLOT(setFollowName(QString)));
+    QObject::connect(&userInterface, SIGNAL(setTargetName(QString)), lastPlayer, SLOT(setTargetName(QString)));
     QObject::connect(tanxInterface, SIGNAL(disconnected()), &evtLoop, SLOT(quit()));
     QObject::connect(&userInterface, SIGNAL(finished()), tanxInterface, SLOT(endConnection()));
     userInterface.start();

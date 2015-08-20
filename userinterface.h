@@ -14,6 +14,9 @@ public:
     void abort();
 signals:
     void setActivated(bool enabled);
+    void setMyName(QString name);
+    void setFollowName(QString name);
+    void setTargetName(QString name);
 protected:
     void run() Q_DECL_OVERRIDE;
 public:
